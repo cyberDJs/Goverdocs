@@ -1,0 +1,231 @@
+{
+  "nodes": [
+    {
+      "id": "DOC-INDEX-GOVERDOCS",
+      "path": "DOCUMENTATION_INDEX.md",
+      "type": "documentation-index"
+    },
+    {
+      "id": "PROJECT-STATE-GOVERDOCS",
+      "path": "PROJECT_STATE.md",
+      "type": "project-state"
+    },
+    {
+      "id": "ARCH-0001",
+      "path": "docs/architecture/ARCH-0001-system-context.md",
+      "type": "architecture"
+    },
+    {
+      "id": "ADR-0001",
+      "path": "docs/decisions/architecture/ADR-0001-deterministic-governor-first.md",
+      "type": "architecture-decision"
+    },
+    {
+      "id": "EPIC-0001",
+      "path": "docs/epics/active/EPIC-0001-governor-foundation.md",
+      "type": "epic"
+    },
+    {
+      "id": "GOV-0001",
+      "path": "docs/governance/GOV-DOCUMENTATION-AUTOMATION.md",
+      "type": "governance"
+    },
+    {
+      "id": "OPS-0001",
+      "path": "docs/operations/OPS-0001-local-development.md",
+      "type": "operations"
+    },
+    {
+      "id": "REV-0001",
+      "path": "docs/reviews/REV-0001-foundation-readiness.md",
+      "type": "review"
+    },
+    {
+      "id": "SEC-0001",
+      "path": "docs/security/SEC-0001-trust-boundaries.md",
+      "type": "security"
+    },
+    {
+      "id": "WB-0001",
+      "path": "docs/work-blocks/active/WB-0001-foundation.md",
+      "type": "work-block"
+    },
+    {
+      "id": "ACTIVE-GOVERDOCS",
+      "path": "project-memory/ACTIVE_WORK.md",
+      "type": "active-work"
+    },
+    {
+      "id": "CTX-GOVERDOCS",
+      "path": "project-memory/CURRENT_CONTEXT.md",
+      "type": "current-context"
+    },
+    {
+      "id": "DEC-REG-GOVERDOCS",
+      "path": "project-memory/DECISIONS_REGISTER.md",
+      "type": "decision-register"
+    },
+    {
+      "id": "OQ-GOVERDOCS",
+      "path": "project-memory/OPEN_QUESTIONS.md",
+      "type": "open-questions"
+    },
+    {
+      "id": "SESSION-GOVERDOCS",
+      "path": "project-memory/SESSION_LOG.md",
+      "type": "session-log"
+    }
+  ],
+  "edges": [
+    {
+      "from": "DOC-INDEX-GOVERDOCS",
+      "to": "GOV-0001",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "ARCH-0001",
+      "type": "related"
+    },
+    {
+      "from": "ARCH-0001",
+      "to": "ADR-0001",
+      "type": "related"
+    },
+    {
+      "from": "ARCH-0001",
+      "to": "GOV-0001",
+      "type": "related"
+    },
+    {
+      "from": "ARCH-0001",
+      "to": "SEC-0001",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0001",
+      "to": "ARCH-0001",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0001",
+      "to": "GOV-0001",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0001",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "EPIC-0001",
+      "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "EPIC-0001",
+      "to": "ADR-0001",
+      "type": "related"
+    },
+    {
+      "from": "EPIC-0001",
+      "to": "ARCH-0001",
+      "type": "related"
+    },
+    {
+      "from": "GOV-0001",
+      "to": "ADR-0001",
+      "type": "related"
+    },
+    {
+      "from": "GOV-0001",
+      "to": "ARCH-0001",
+      "type": "related"
+    },
+    {
+      "from": "GOV-0001",
+      "to": "SEC-0001",
+      "type": "related"
+    },
+    {
+      "from": "OPS-0001",
+      "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "OPS-0001",
+      "to": "ARCH-0001",
+      "type": "related"
+    },
+    {
+      "from": "REV-0001",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "REV-0001",
+      "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "SEC-0001",
+      "to": "ADR-0001",
+      "type": "related"
+    },
+    {
+      "from": "SEC-0001",
+      "to": "GOV-0001",
+      "type": "related"
+    },
+    {
+      "from": "SEC-0001",
+      "to": "ARCH-0001",
+      "type": "related"
+    },
+    {
+      "from": "WB-0001",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "WB-0001",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "ACTIVE-GOVERDOCS",
+      "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "DEC-REG-GOVERDOCS",
+      "to": "ADR-0001",
+      "type": "related"
+    },
+    {
+      "from": "OQ-GOVERDOCS",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "SESSION-GOVERDOCS",
+      "to": "WB-0001",
+      "type": "related"
+    }
+  ]
+}

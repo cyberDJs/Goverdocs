@@ -1,0 +1,2207 @@
+version: 1
+name: GOVERDOCS Documentation Decision Matrix
+default_action: no-op
+default_write_mode: draft
+rules:
+- id: DOC-EVT-001
+  event: project_created
+  description: Vznik nového projektu
+  detection:
+    any:
+    - changed_paths:
+      - README.md
+      - pyproject.toml
+      - .goverdocs.yaml
+    - labels:
+      - project-created
+    - semantic_signals:
+      - vznik nového projektu
+  severity: high
+  priority: 90
+  actions:
+  - document_type: project-state
+    action: create
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: documentation-index
+    action: create
+    target: DOCUMENTATION_INDEX.md
+    write_policy: generated
+  - document_type: current-context
+    action: create
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-002
+  event: project_state_changed
+  description: Změna aktuálního stavu projektu
+  detection:
+    any:
+    - changed_paths:
+      - PROJECT_STATE.md
+    - labels:
+      - project-state-changed
+    - semantic_signals:
+      - změna aktuálního stavu projektu
+  severity: medium
+  priority: 30
+  actions:
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: current-context
+    action: update
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-003
+  event: work_block_started
+  description: Zahájení pracovního bloku
+  detection:
+    any:
+    - changed_paths:
+      - docs/work-blocks/active/**
+    - labels:
+      - work-block-started
+    - semantic_signals:
+      - zahájení pracovního bloku
+  severity: medium
+  priority: 35
+  actions:
+  - document_type: work-block
+    action: create
+    target: docs/work-blocks/active/WB-*.md
+    write_policy: automatic
+  - document_type: active-work
+    action: update
+    target: project-memory/ACTIVE_WORK.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-004
+  event: work_block_completed
+  description: Dokončení pracovního bloku
+  detection:
+    any:
+    - changed_paths:
+      - docs/work-blocks/**
+    - labels:
+      - work-block-completed
+    - semantic_signals:
+      - dokončení pracovního bloku
+  severity: medium
+  priority: 40
+  actions:
+  - document_type: work-block
+    action: update
+    target: docs/work-blocks/completed/WB-*.md
+    write_policy: approval-required
+  - document_type: active-work
+    action: update
+    target: project-memory/ACTIVE_WORK.md
+    write_policy: automatic
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-005
+  event: work_block_blocked
+  description: Zablokování práce
+  detection:
+    any:
+    - changed_paths:
+      - project-memory/ACTIVE_WORK.md
+    - labels:
+      - work-block-blocked
+    - semantic_signals:
+      - zablokování práce
+  severity: medium
+  priority: 45
+  actions:
+  - document_type: work-block
+    action: update
+    target: docs/work-blocks/active/WB-*.md
+    write_policy: automatic
+  - document_type: active-work
+    action: update
+    target: project-memory/ACTIVE_WORK.md
+    write_policy: automatic
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-006
+  event: open_question_created
+  description: Vznik nového otevřeného tématu
+  detection:
+    any:
+    - changed_paths:
+      - project-memory/OPEN_QUESTIONS.md
+    - labels:
+      - open-question-created
+    - semantic_signals:
+      - vznik nového otevřeného tématu
+  severity: low
+  priority: 20
+  actions:
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-007
+  event: open_question_closed
+  description: Uzavření otevřeného tématu
+  detection:
+    any:
+    - changed_paths:
+      - project-memory/OPEN_QUESTIONS.md
+    - labels:
+      - open-question-closed
+    - semantic_signals:
+      - uzavření otevřeného tématu
+  severity: low
+  priority: 20
+  actions:
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  - document_type: current-context
+    action: update
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-008
+  event: decision_accepted
+  description: Vznik schváleného rozhodnutí
+  detection:
+    any:
+    - changed_paths:
+      - docs/decisions/**
+    - labels:
+      - decision-accepted
+    - semantic_signals:
+      - vznik schváleného rozhodnutí
+  severity: high
+  priority: 70
+  actions:
+  - document_type: decision
+    action: create
+    target: docs/decisions/**/ADR-*.md
+    write_policy: approval-required
+  - document_type: decision-register
+    action: append
+    target: project-memory/DECISIONS_REGISTER.md
+    write_policy: append-only
+  - document_type: documentation-index
+    action: update
+    target: DOCUMENTATION_INDEX.md
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-009
+  event: accepted_decision_changed
+  description: Změna již schváleného rozhodnutí
+  detection:
+    any:
+    - changed_paths:
+      - docs/decisions/**
+    - labels:
+      - accepted-decision-changed
+    - semantic_signals:
+      - změna již schváleného rozhodnutí
+  severity: critical
+  priority: 95
+  actions:
+  - document_type: decision
+    action: supersede
+    target: docs/decisions/**/ADR-*.md
+    write_policy: approval-required
+  - document_type: decision-register
+    action: append
+    target: project-memory/DECISIONS_REGISTER.md
+    write_policy: append-only
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-010
+  event: adr_superseded
+  description: Nahrazení existujícího ADR
+  detection:
+    any:
+    - changed_paths:
+      - docs/decisions/**
+    - labels:
+      - adr-superseded
+    - semantic_signals:
+      - nahrazení existujícího adr
+  severity: high
+  priority: 85
+  actions:
+  - document_type: decision
+    action: supersede
+    target: docs/decisions/**/ADR-*.md
+    write_policy: approval-required
+  - document_type: decision-register
+    action: append
+    target: project-memory/DECISIONS_REGISTER.md
+    write_policy: append-only
+  - document_type: relationship-graph
+    action: update
+    target: manifests/RELATIONSHIP_GRAPH.json
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-011
+  event: architecture_change
+  description: Změna architektury
+  detection:
+    any:
+    - changed_paths:
+      - docs/architecture/**
+      - src/**
+    - labels:
+      - architecture-change
+    - semantic_signals:
+      - změna architektury
+  severity: high
+  priority: 80
+  actions:
+  - document_type: architecture
+    action: update_or_create
+    target: docs/architecture/ARCH-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/architecture/ADR-*.md
+    write_policy: approval-required
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-012
+  event: component_responsibility_change
+  description: Změna komponent nebo jejich odpovědností
+  detection:
+    any:
+    - changed_paths:
+      - src/**
+      - docs/architecture/**
+    - labels:
+      - component-responsibility-change
+    - semantic_signals:
+      - změna komponent nebo jejich odpovědností
+  severity: high
+  priority: 75
+  actions:
+  - document_type: architecture
+    action: update
+    target: docs/architecture/ARCH-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/architecture/ADR-*.md
+    write_policy: approval-required
+  - document_type: relationship-graph
+    action: update
+    target: manifests/RELATIONSHIP_GRAPH.json
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-013
+  event: integration_interface_change
+  description: Změna integračního rozhraní
+  detection:
+    any:
+    - changed_paths:
+      - src/**/adapters/**
+      - src/**/integrations/**
+    - labels:
+      - integration-interface-change
+    - semantic_signals:
+      - změna integračního rozhraní
+  severity: high
+  priority: 75
+  actions:
+  - document_type: architecture
+    action: update
+    target: docs/architecture/ARCH-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/architecture/ADR-*.md
+    write_policy: approval-required
+  - document_type: operations
+    action: update_or_create
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-014
+  event: api_contract_change
+  description: Změna API kontraktu
+  detection:
+    any:
+    - changed_paths:
+      - openapi.*
+      - api/**
+      - src/**/routes/**
+    - labels:
+      - api-contract-change
+    - semantic_signals:
+      - změna api kontraktu
+  severity: high
+  priority: 78
+  actions:
+  - document_type: architecture
+    action: update
+    target: docs/architecture/ARCH-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/architecture/ADR-*.md
+    write_policy: approval-required
+  - document_type: release-note
+    action: update
+    target: generated/RELEASE_NOTES.md
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-015
+  event: data_model_change
+  description: Změna datového modelu
+  detection:
+    any:
+    - changed_paths:
+      - migrations/**
+      - schemas/**
+      - models/**
+    - labels:
+      - data-model-change
+    - semantic_signals:
+      - změna datového modelu
+  severity: high
+  priority: 76
+  actions:
+  - document_type: architecture
+    action: update
+    target: docs/architecture/ARCH-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/architecture/ADR-*.md
+    write_policy: approval-required
+  - document_type: migration-plan
+    action: create
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-016
+  event: security_boundary_change
+  description: Změna bezpečnostní hranice
+  detection:
+    any:
+    - changed_paths:
+      - docs/security/**
+      - src/**/auth/**
+      - src/**/security/**
+    - labels:
+      - security-boundary-change
+    - semantic_signals:
+      - změna bezpečnostní hranice
+  severity: critical
+  priority: 100
+  actions:
+  - document_type: security
+    action: update_or_create
+    target: docs/security/SEC-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/security/ADR-*.md
+    write_policy: approval-required
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-017
+  event: authentication_authorization_change
+  description: Změna autentizace nebo autorizace
+  detection:
+    any:
+    - changed_paths:
+      - src/**/auth/**
+      - src/**/identity/**
+      - src/**/policy/**
+    - labels:
+      - authentication-authorization-change
+    - semantic_signals:
+      - změna autentizace nebo autorizace
+  severity: critical
+  priority: 100
+  actions:
+  - document_type: security
+    action: update
+    target: docs/security/SEC-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/security/ADR-*.md
+    write_policy: approval-required
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-018
+  event: secrets_handling_change
+  description: Změna práce se secrets
+  detection:
+    any:
+    - changed_paths:
+      - .env*
+      - secrets/**
+      - src/**/config/**
+    - labels:
+      - secrets-handling-change
+    - semantic_signals:
+      - změna práce se secrets
+  severity: critical
+  priority: 100
+  actions:
+  - document_type: security
+    action: update
+    target: docs/security/SEC-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/security/ADR-*.md
+    write_policy: approval-required
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-019
+  event: security_incident
+  description: Vznik bezpečnostního incidentu
+  detection:
+    any:
+    - changed_paths:
+      - incidents/**
+      - security/**
+    - labels:
+      - security-incident
+    - semantic_signals:
+      - vznik bezpečnostního incidentu
+  severity: critical
+  priority: 110
+  actions:
+  - document_type: incident
+    action: create
+    target: docs/security/incidents/INC-*.md
+    write_policy: immutable
+  - document_type: evidence
+    action: create
+    target: evidence/incidents/**
+    write_policy: immutable
+  - document_type: work-block
+    action: create
+    target: docs/work-blocks/active/WB-*.md
+    write_policy: automatic
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-020
+  event: security_vulnerability_fixed
+  description: Oprava bezpečnostní zranitelnosti
+  detection:
+    any:
+    - changed_paths:
+      - src/**/security/**
+      - security/**
+    - labels:
+      - security-vulnerability-fixed
+    - semantic_signals:
+      - oprava bezpečnostní zranitelnosti
+  severity: critical
+  priority: 105
+  actions:
+  - document_type: security
+    action: update
+    target: docs/security/SEC-*.md
+    write_policy: approval-required
+  - document_type: incident
+    action: update
+    target: docs/security/incidents/INC-*.md
+    write_policy: approval-required
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: release-note
+    action: update
+    target: generated/RELEASE_NOTES.md
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-021
+  event: epic_created
+  description: Vznik nového EPICu
+  detection:
+    any:
+    - changed_paths:
+      - docs/epics/active/**
+    - labels:
+      - epic-created
+    - semantic_signals:
+      - vznik nového epicu
+  severity: medium
+  priority: 50
+  actions:
+  - document_type: epic
+    action: create
+    target: docs/epics/active/EPIC-*.md
+    write_policy: approval-required
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: documentation-index
+    action: update
+    target: DOCUMENTATION_INDEX.md
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-022
+  event: epic_scope_changed
+  description: Změna rozsahu EPICu
+  detection:
+    any:
+    - changed_paths:
+      - docs/epics/active/**
+    - labels:
+      - epic-scope-changed
+    - semantic_signals:
+      - změna rozsahu epicu
+  severity: high
+  priority: 60
+  actions:
+  - document_type: epic
+    action: update
+    target: docs/epics/active/EPIC-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/product/ADR-*.md
+    write_policy: approval-required
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-023
+  event: epic_closed
+  description: Dokončení nebo zrušení EPICu
+  detection:
+    any:
+    - changed_paths:
+      - docs/epics/**
+    - labels:
+      - epic-closed
+    - semantic_signals:
+      - dokončení nebo zrušení epicu
+  severity: medium
+  priority: 55
+  actions:
+  - document_type: epic
+    action: archive
+    target: docs/epics/{completed,cancelled}/EPIC-*.md
+    write_policy: approval-required
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-024
+  event: deployment_change
+  description: Změna deploymentu
+  detection:
+    any:
+    - changed_paths:
+      - Dockerfile
+      - docker-compose*.yml
+      - deploy/**
+      - k8s/**
+    - labels:
+      - deployment-change
+    - semantic_signals:
+      - změna deploymentu
+  severity: high
+  priority: 70
+  actions:
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/infrastructure/ADR-*.md
+    write_policy: approval-required
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-025
+  event: cicd_change
+  description: Změna CI/CD
+  detection:
+    any:
+    - changed_paths:
+      - .github/workflows/**
+      - .gitlab-ci.yml
+      - ci/**
+    - labels:
+      - cicd-change
+    - semantic_signals:
+      - změna ci/cd
+  severity: high
+  priority: 68
+  actions:
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/infrastructure/ADR-*.md
+    write_policy: approval-required
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-026
+  event: infrastructure_change
+  description: Změna infrastruktury
+  detection:
+    any:
+    - changed_paths:
+      - terraform/**
+      - infra/**
+      - k8s/**
+    - labels:
+      - infrastructure-change
+    - semantic_signals:
+      - změna infrastruktury
+  severity: high
+  priority: 72
+  actions:
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/infrastructure/ADR-*.md
+    write_policy: approval-required
+  - document_type: architecture
+    action: update
+    target: docs/architecture/ARCH-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-027
+  event: environment_configuration_change
+  description: Změna konfigurace prostředí
+  detection:
+    any:
+    - changed_paths:
+      - .env.example
+      - config/**
+      - settings/**
+    - labels:
+      - environment-configuration-change
+    - semantic_signals:
+      - změna konfigurace prostředí
+  severity: medium
+  priority: 58
+  actions:
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: current-context
+    action: update
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-028
+  event: dependency_change
+  description: Změna závislostí
+  detection:
+    any:
+    - changed_paths:
+      - pyproject.toml
+      - requirements*.txt
+      - package.json
+      - '*lock*'
+    - labels:
+      - dependency-change
+    - semantic_signals:
+      - změna závislostí
+  severity: medium
+  priority: 55
+  actions:
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-029
+  event: breaking_change
+  description: Breaking change
+  detection:
+    any:
+    - changed_paths:
+      - src/**
+      - api/**
+      - schemas/**
+    - labels:
+      - breaking-change
+    - semantic_signals:
+      - breaking change
+  severity: critical
+  priority: 98
+  actions:
+  - document_type: decision
+    action: create
+    target: docs/decisions/architecture/ADR-*.md
+    write_policy: approval-required
+  - document_type: migration-plan
+    action: create
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: release-note
+    action: update
+    target: generated/RELEASE_NOTES.md
+    write_policy: generated
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-030
+  event: governance_change
+  description: Změna governance pravidel
+  detection:
+    any:
+    - changed_paths:
+      - docs/governance/**
+      - automation/**
+    - labels:
+      - governance-change
+    - semantic_signals:
+      - změna governance pravidel
+  severity: critical
+  priority: 92
+  actions:
+  - document_type: governance
+    action: update
+    target: docs/governance/GOV-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/governance/ADR-*.md
+    write_policy: approval-required
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-031
+  event: runbook_change
+  description: Změna provozního runbooku
+  detection:
+    any:
+    - changed_paths:
+      - docs/operations/**
+      - runbooks/**
+    - labels:
+      - runbook-change
+    - semantic_signals:
+      - změna provozního runbooku
+  severity: medium
+  priority: 52
+  actions:
+  - document_type: operations
+    action: update
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-032
+  event: technical_debt_created
+  description: Vznik technického dluhu
+  detection:
+    any:
+    - changed_paths:
+      - src/**
+      - docs/reviews/**
+    - labels:
+      - technical-debt-created
+    - semantic_signals:
+      - vznik technického dluhu
+  severity: medium
+  priority: 46
+  actions:
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  - document_type: work-block
+    action: create
+    target: docs/work-blocks/active/WB-*.md
+    write_policy: automatic
+  - document_type: review
+    action: update_or_create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-033
+  event: technical_debt_removed
+  description: Odstranění technického dluhu
+  detection:
+    any:
+    - changed_paths:
+      - src/**
+      - docs/work-blocks/**
+    - labels:
+      - technical-debt-removed
+    - semantic_signals:
+      - odstranění technického dluhu
+  severity: medium
+  priority: 46
+  actions:
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  - document_type: work-block
+    action: update
+    target: docs/work-blocks/completed/WB-*.md
+    write_policy: approval-required
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-034
+  event: roadmap_change
+  description: Změna roadmapy
+  detection:
+    any:
+    - changed_paths:
+      - PROJECT_STATE.md
+      - docs/epics/**
+      - roadmap/**
+    - labels:
+      - roadmap-change
+    - semantic_signals:
+      - změna roadmapy
+  severity: high
+  priority: 65
+  actions:
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: epic
+    action: update_or_create
+    target: docs/epics/**/EPIC-*.md
+    write_policy: approval-required
+  - document_type: decision
+    action: create
+    target: docs/decisions/product/ADR-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-035
+  event: release_created
+  description: Release
+  detection:
+    any:
+    - changed_paths:
+      - CHANGELOG.md
+      - generated/RELEASE_NOTES.md
+    - labels:
+      - release-created
+    - semantic_signals:
+      - release
+  severity: high
+  priority: 74
+  actions:
+  - document_type: release-note
+    action: update
+    target: generated/RELEASE_NOTES.md
+    write_policy: generated
+  - document_type: evidence
+    action: create
+    target: evidence/releases/**
+    write_policy: immutable
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-036
+  event: release_rollback
+  description: Rollback release
+  detection:
+    any:
+    - changed_paths:
+      - generated/RELEASE_NOTES.md
+      - evidence/releases/**
+    - labels:
+      - release-rollback
+    - semantic_signals:
+      - rollback release
+  severity: critical
+  priority: 96
+  actions:
+  - document_type: operations
+    action: create
+    target: docs/operations/OPS-*.md
+    write_policy: approval-required
+  - document_type: evidence
+    action: create
+    target: evidence/releases/**
+    write_policy: immutable
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-037
+  event: audit_review_created
+  description: Audit nebo review
+  detection:
+    any:
+    - changed_paths:
+      - docs/reviews/**
+    - labels:
+      - audit-review-created
+    - semantic_signals:
+      - audit nebo review
+  severity: medium
+  priority: 48
+  actions:
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  - document_type: documentation-index
+    action: update
+    target: DOCUMENTATION_INDEX.md
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-038
+  event: document_changed
+  description: Změna dokumentu
+  detection:
+    any:
+    - changed_paths:
+      - '**/*.md'
+    - labels:
+      - document-changed
+    - semantic_signals:
+      - změna dokumentu
+  severity: low
+  priority: 15
+  actions:
+  - document_type: documentation-index
+    action: update
+    target: DOCUMENTATION_INDEX.md
+    write_policy: generated
+  - document_type: document-registry
+    action: update
+    target: manifests/DOCUMENT_REGISTRY.yaml
+    write_policy: generated
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-039
+  event: duplicate_detected
+  description: Detekce duplicity
+  detection:
+    any:
+    - changed_paths:
+      - '**/*.md'
+    - labels:
+      - duplicate-detected
+    - semantic_signals:
+      - detekce duplicity
+  severity: high
+  priority: 62
+  actions:
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-040
+  event: broken_link_detected
+  description: Detekce neplatného odkazu
+  detection:
+    any:
+    - changed_paths:
+      - '**/*.md'
+    - labels:
+      - broken-link-detected
+    - semantic_signals:
+      - detekce neplatného odkazu
+  severity: medium
+  priority: 42
+  actions:
+  - document_type: review
+    action: update_or_create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: documentation-index
+    action: update
+    target: DOCUMENTATION_INDEX.md
+    write_policy: generated
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-041
+  event: metadata_missing
+  description: Detekce chybějících metadat
+  detection:
+    any:
+    - changed_paths:
+      - '**/*.md'
+    - labels:
+      - metadata-missing
+    - semantic_signals:
+      - detekce chybějících metadat
+  severity: high
+  priority: 64
+  actions:
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-042
+  event: document_conflict_detected
+  description: Detekce konfliktu mezi dokumenty
+  detection:
+    any:
+    - changed_paths:
+      - '**/*.md'
+    - labels:
+      - document-conflict-detected
+    - semantic_signals:
+      - detekce konfliktu mezi dokumenty
+  severity: critical
+  priority: 94
+  actions:
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  - document_type: open-questions
+    action: append
+    target: project-memory/OPEN_QUESTIONS.md
+    write_policy: append-only
+  - document_type: current-context
+    action: update
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-043
+  event: session_started
+  description: Nová pracovní session
+  detection:
+    any:
+    - changed_paths:
+      - project-memory/SESSION_LOG.md
+    - labels:
+      - session-started
+    - semantic_signals:
+      - nová pracovní session
+  severity: low
+  priority: 10
+  actions:
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  - document_type: current-context
+    action: update
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  - document_type: active-work
+    action: update
+    target: project-memory/ACTIVE_WORK.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-044
+  event: session_ended
+  description: Ukončení pracovní session
+  detection:
+    any:
+    - changed_paths:
+      - project-memory/SESSION_LOG.md
+    - labels:
+      - session-ended
+    - semantic_signals:
+      - ukončení pracovní session
+  severity: low
+  priority: 12
+  actions:
+  - document_type: session-log
+    action: append
+    target: project-memory/SESSION_LOG.md
+    write_policy: append-only
+  - document_type: current-context
+    action: update
+    target: project-memory/CURRENT_CONTEXT.md
+    write_policy: automatic
+  - document_type: project-state
+    action: update
+    target: PROJECT_STATE.md
+    write_policy: automatic
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: false
+    roles: []
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true
+- id: DOC-EVT-045
+  event: external_decision_imported
+  description: Import rozhodnutí z chatu nebo externího zdroje
+  detection:
+    any:
+    - changed_paths:
+      - imports/**
+      - project-memory/**
+    - labels:
+      - external-decision-imported
+    - semantic_signals:
+      - import rozhodnutí z chatu nebo externího zdroje
+  severity: high
+  priority: 66
+  actions:
+  - document_type: decision
+    action: create
+    target: docs/decisions/**/ADR-*.md
+    write_policy: approval-required
+  - document_type: decision-register
+    action: append
+    target: project-memory/DECISIONS_REGISTER.md
+    write_policy: append-only
+  - document_type: review
+    action: create
+    target: docs/reviews/REV-*.md
+    write_policy: approval-required
+  required_evidence:
+  - source reference
+  - change rationale
+  - affected scope
+  validations:
+  - metadata-schema
+  - unique-id
+  - relationship-integrity
+  - link-check
+  - duplicate-detection
+  - approval-state
+  approval:
+    required: true
+    roles:
+    - project-owner
+  rollback:
+    strategy: revert-draft-or-restore-receipt
+    preserve_audit_log: true
+  on_failure:
+    action: block-write
+    create_report: true
+    open_question: true

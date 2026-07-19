@@ -1,0 +1,182 @@
+generated_at: 2026-07-19T10:05:20+00:00
+documents:
+- id: DOC-INDEX-GOVERDOCS
+  path: DOCUMENTATION_INDEX.md
+  type: documentation-index
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - GOV-0001
+  supersedes: null
+  superseded_by: null
+- id: PROJECT-STATE-GOVERDOCS
+  path: PROJECT_STATE.md
+  type: project-state
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - EPIC-0001
+  - ARCH-0001
+  supersedes: null
+  superseded_by: null
+- id: ARCH-0001
+  path: docs/architecture/ARCH-0001-system-context.md
+  type: architecture
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - ADR-0001
+  - GOV-0001
+  - SEC-0001
+  supersedes: null
+  superseded_by: null
+- id: ADR-0001
+  path: docs/decisions/architecture/ADR-0001-deterministic-governor-first.md
+  type: architecture-decision
+  status: accepted
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - ARCH-0001
+  - GOV-0001
+  - EPIC-0001
+  supersedes: null
+  superseded_by: null
+- id: EPIC-0001
+  path: docs/epics/active/EPIC-0001-governor-foundation.md
+  type: epic
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - WB-0001
+  - ADR-0001
+  - ARCH-0001
+  supersedes: null
+  superseded_by: null
+- id: GOV-0001
+  path: docs/governance/GOV-DOCUMENTATION-AUTOMATION.md
+  type: governance
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - ADR-0001
+  - ARCH-0001
+  - SEC-0001
+  supersedes: null
+  superseded_by: null
+- id: OPS-0001
+  path: docs/operations/OPS-0001-local-development.md
+  type: operations
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - WB-0001
+  - ARCH-0001
+  supersedes: null
+  superseded_by: null
+- id: REV-0001
+  path: docs/reviews/REV-0001-foundation-readiness.md
+  type: review
+  status: accepted
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - EPIC-0001
+  - WB-0001
+  supersedes: null
+  superseded_by: null
+- id: SEC-0001
+  path: docs/security/SEC-0001-trust-boundaries.md
+  type: security
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - ADR-0001
+  - GOV-0001
+  - ARCH-0001
+  supersedes: null
+  superseded_by: null
+- id: WB-0001
+  path: docs/work-blocks/active/WB-0001-foundation.md
+  type: work-block
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - EPIC-0001
+  - PROJECT-STATE-GOVERDOCS
+  supersedes: null
+  superseded_by: null
+- id: ACTIVE-GOVERDOCS
+  path: project-memory/ACTIVE_WORK.md
+  type: active-work
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - WB-0001
+  supersedes: null
+  superseded_by: null
+- id: CTX-GOVERDOCS
+  path: project-memory/CURRENT_CONTEXT.md
+  type: current-context
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - PROJECT-STATE-GOVERDOCS
+  - WB-0001
+  supersedes: null
+  superseded_by: null
+- id: DEC-REG-GOVERDOCS
+  path: project-memory/DECISIONS_REGISTER.md
+  type: decision-register
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - ADR-0001
+  supersedes: null
+  superseded_by: null
+- id: OQ-GOVERDOCS
+  path: project-memory/OPEN_QUESTIONS.md
+  type: open-questions
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - EPIC-0001
+  supersedes: null
+  superseded_by: null
+- id: SESSION-GOVERDOCS
+  path: project-memory/SESSION_LOG.md
+  type: session-log
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-19
+  related:
+  - WB-0001
+  supersedes: null
+  superseded_by: null

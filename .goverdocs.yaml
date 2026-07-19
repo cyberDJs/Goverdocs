@@ -1,0 +1,5 @@
+version: 1
+project_name: GOVERDOCS
+policy_path: automation/documentation_policy.yaml
+matrix_path: automation/documentation_decision_matrix.yaml
+metadata_schema_path: schemas/document-metadata.schema.json

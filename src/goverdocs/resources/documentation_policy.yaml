@@ -1,0 +1,63 @@
+version: 1
+default_write_mode: draft
+require_diff: true
+require_source_reference: true
+preserve_history: true
+allow_silent_overwrite: false
+canonical_root: .
+metadata_required:
+- PROJECT_STATE.md
+- DOCUMENTATION_INDEX.md
+- project-memory/*.md
+- docs/**/*.md
+excluded:
+- README.md
+- CHANGELOG.md
+- archive/**
+- generated/**
+- templates/**
+auto_update:
+- PROJECT_STATE.md
+- DOCUMENTATION_INDEX.md
+- project-memory/CURRENT_CONTEXT.md
+- project-memory/ACTIVE_WORK.md
+- project-memory/OPEN_QUESTIONS.md
+- manifests/**
+- generated/**
+append_only:
+- project-memory/SESSION_LOG.md
+- project-memory/DECISIONS_REGISTER.md
+approval_required:
+- docs/decisions/**
+- docs/architecture/**
+- docs/security/**
+- docs/governance/**
+- docs/operations/**
+- docs/reviews/**
+immutable_after_acceptance:
+- docs/security/incidents/**
+- evidence/incidents/**
+- evidence/releases/**
+status_values:
+- draft
+- proposed
+- in-review
+- accepted
+- active
+- blocked
+- completed
+- rejected
+- cancelled
+- deprecated
+- superseded
+- archived
+managed_by_values:
+- human
+- agent
+- mixed
+write_policy_values:
+- automatic
+- append-only
+- approval-required
+- immutable
+- generated

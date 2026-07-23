@@ -1,9 +1,8 @@
 {
-  "generated_at": "2026-07-19T08:52:10+00:00",
-  "document_count": 15,
+  "generated_at": "2026-07-23T16:48:28+00:00",
+  "document_count": 16,
   "status_counts": {
-    "accepted": 1,
-    "active": 13,
-    "in-review": 1
+    "accepted": 3,
+    "active": 13
   }
 }

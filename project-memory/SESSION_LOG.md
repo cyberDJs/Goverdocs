@@ -43,3 +43,14 @@ review_due: null
 - Integrated the constitution as an immutable governance artifact without modifying its canonical bytes.
 - Added a checksum manifest and regression test.
 - Remote `origin`, final licence and release tag remain unresolved.
+
+## SESSION-2026-07-23-02
+
+- User explicitly selected Apache License 2.0.
+- Added the canonical Apache-2.0 licence text as `LICENSE`.
+- Added ADR-0002, immutable artifact metadata and a regression test.
+- Fixed `rebuild-index` to regenerate the document status summary from the registry.
+- Added CLI orchestration coverage and malformed-registry failure-mode coverage.
+- Refreshed generated-index and append-only registry verification metadata.
+- Updated project state, context, decision register and open-question evidence.
+- No push, tag or release was performed.

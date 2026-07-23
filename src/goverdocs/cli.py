@@ -12,7 +12,12 @@ from .indexer import rebuild_index
 from .initializer import initialize_project
 from .planner import plan
 from .receipts import create_receipt
-from .registry import build_registry, write_registry, write_relationship_graph
+from .registry import (
+    build_registry,
+    write_registry,
+    write_relationship_graph,
+    write_status_summary,
+)
 from .validator import validate_project
 
 
@@ -122,9 +127,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             target = rebuild_index(config.root, config.policy_path)
             registry = write_registry(config.root, config.policy_path)
             write_relationship_graph(config.root, registry)
+            write_status_summary(config.root, registry)
             print(f"UPDATED {target.relative_to(config.root)}")
             print("UPDATED manifests/DOCUMENT_REGISTRY.yaml")
             print("UPDATED manifests/RELATIONSHIP_GRAPH.json")
+            print("UPDATED manifests/DOCUMENT_STATUS_SUMMARY.json")
             return 0
         if args.command == "health":
             registry = build_registry(config.root, config.policy_path)

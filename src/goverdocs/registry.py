@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -46,6 +47,53 @@ def write_registry(root: Path, policy_path: Path) -> dict[str, Any]:
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(dump_yaml(registry), encoding="utf-8")
     return registry
+
+
+def build_status_summary(registry: dict[str, Any]) -> dict[str, Any]:
+    raw_documents = registry.get("documents")
+    generated_at = registry.get("generated_at")
+
+    if not isinstance(raw_documents, list):
+        raise ValueError("registry documents must be a list")
+
+    if not isinstance(generated_at, str):
+        raise ValueError("registry generated_at must be a string")
+
+    documents: list[dict[str, Any]] = []
+    statuses: list[str] = []
+
+    for item in raw_documents:
+        if not isinstance(item, dict):
+            raise ValueError("registry document entries must be mappings")
+
+        status = item.get("status")
+        if not isinstance(status, str) or not status.strip():
+            raise ValueError(
+                "registry document status must be a non-empty string"
+            )
+
+        documents.append(item)
+        statuses.append(status)
+
+    status_counts = Counter(statuses)
+
+    return {
+        "generated_at": generated_at,
+        "document_count": len(documents),
+        "status_counts": dict(sorted(status_counts.items())),
+    }
+
+
+def write_status_summary(
+    root: Path,
+    registry: dict[str, Any],
+) -> dict[str, Any]:
+    summary = build_status_summary(registry)
+    write_json(
+        root / "manifests/DOCUMENT_STATUS_SUMMARY.json",
+        summary,
+    )
+    return summary
 
 
 def write_relationship_graph(root: Path, registry: dict[str, Any]) -> None:

@@ -15,9 +15,11 @@ superseded_by: null
 related:
   - EPIC-0001
   - ARCH-0001
+  - ADR-0002
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-23-01
+  - SESSION-2026-07-23-02
 last_verified: 2026-07-23
 review_due: null
 ---
@@ -32,6 +34,7 @@ review_due: null
 - Metadata, relationship and local-link validation: implemented
 - Audit receipts: implemented
 - Normative technical constitution: integrated and checksum-locked
+- Licence: Apache-2.0, recorded by ADR-0002
 - AI writer: not implemented
 - Canonical automatic write: disabled
 

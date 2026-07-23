@@ -1,3 +1,8 @@
-# License decision required
+# License selection
 
-Licence zatím nebyla zvolena. Před zveřejněním rozhodněte mezi Apache-2.0, AGPL-3.0 a proprietární licencí. Do rozhodnutí se projekt nesmí vydávat za open source.
+GOVERDOCS is licensed under the Apache License, Version 2.0.
+
+- SPDX identifier: `Apache-2.0`
+- Canonical license text: [`LICENSE`](LICENSE)
+- Decision record: [`ADR-0002`](docs/decisions/governance/ADR-0002-apache-2-license.md)
+- Selected: `2026-07-23`

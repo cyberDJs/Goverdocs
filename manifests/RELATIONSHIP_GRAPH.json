@@ -21,6 +21,11 @@
       "type": "architecture-decision"
     },
     {
+      "id": "ADR-0002",
+      "path": "docs/decisions/governance/ADR-0002-apache-2-license.md",
+      "type": "architecture-decision"
+    },
+    {
       "id": "EPIC-0001",
       "path": "docs/epics/active/EPIC-0001-governor-foundation.md",
       "type": "epic"
@@ -93,6 +98,11 @@
       "type": "related"
     },
     {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "ADR-0002",
+      "type": "related"
+    },
+    {
       "from": "ARCH-0001",
       "to": "ADR-0001",
       "type": "related"
@@ -120,6 +130,21 @@
     {
       "from": "ADR-0001",
       "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0002",
+      "to": "GOV-0001",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0002",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0002",
+      "to": "OQ-GOVERDOCS",
       "type": "related"
     },
     {
@@ -213,13 +238,28 @@
       "type": "related"
     },
     {
+      "from": "CTX-GOVERDOCS",
+      "to": "ADR-0002",
+      "type": "related"
+    },
+    {
       "from": "DEC-REG-GOVERDOCS",
       "to": "ADR-0001",
       "type": "related"
     },
     {
+      "from": "DEC-REG-GOVERDOCS",
+      "to": "ADR-0002",
+      "type": "related"
+    },
+    {
       "from": "OQ-GOVERDOCS",
       "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "OQ-GOVERDOCS",
+      "to": "ADR-0002",
       "type": "related"
     },
     {

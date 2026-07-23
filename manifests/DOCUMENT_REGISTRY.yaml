@@ -1,4 +1,4 @@
-generated_at: 2026-07-19T10:05:20+00:00
+generated_at: 2026-07-23T16:48:28+00:00
 documents:
 - id: DOC-INDEX-GOVERDOCS
   path: DOCUMENTATION_INDEX.md
@@ -6,7 +6,7 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-23
   related:
   - GOV-0001
   supersedes: null
@@ -17,10 +17,11 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-23
   related:
   - EPIC-0001
   - ARCH-0001
+  - ADR-0002
   supersedes: null
   superseded_by: null
 - id: ARCH-0001
@@ -47,6 +48,19 @@ documents:
   - ARCH-0001
   - GOV-0001
   - EPIC-0001
+  supersedes: null
+  superseded_by: null
+- id: ADR-0002
+  path: docs/decisions/governance/ADR-0002-apache-2-license.md
+  type: architecture-decision
+  status: accepted
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-23
+  related:
+  - GOV-0001
+  - PROJECT-STATE-GOVERDOCS
+  - OQ-GOVERDOCS
   supersedes: null
   superseded_by: null
 - id: EPIC-0001
@@ -141,10 +155,11 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-23
   related:
   - PROJECT-STATE-GOVERDOCS
   - WB-0001
+  - ADR-0002
   supersedes: null
   superseded_by: null
 - id: DEC-REG-GOVERDOCS
@@ -153,9 +168,10 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-23
   related:
   - ADR-0001
+  - ADR-0002
   supersedes: null
   superseded_by: null
 - id: OQ-GOVERDOCS
@@ -164,9 +180,10 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-23
   related:
   - EPIC-0001
+  - ADR-0002
   supersedes: null
   superseded_by: null
 - id: SESSION-GOVERDOCS
@@ -175,7 +192,7 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-23
   related:
   - WB-0001
   supersedes: null

@@ -33,6 +33,12 @@ Jeho integrita je deklarována v `manifests/GOVERNANCE_ARTIFACTS.yaml` a ověřo
 - testy a GitHub CI,
 - bez AI runtime a bez automatického canonical zápisu.
 
+## Licence
+
+GOVERDOCS je licencován pod Apache License 2.0 (`Apache-2.0`).
+Kanonický text je v souboru [`LICENSE`](LICENSE) a rozhodnutí dokumentuje
+[`ADR-0002`](docs/decisions/governance/ADR-0002-apache-2-license.md).
+
 ## Lokální instalace
 
 ```bash

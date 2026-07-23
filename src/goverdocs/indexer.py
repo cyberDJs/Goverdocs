@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 from .registry import build_registry
@@ -7,6 +8,20 @@ from .registry import build_registry
 
 def rebuild_index(root: Path, policy_path: Path) -> Path:
     registry = build_registry(root, policy_path)
+
+    generated_at = registry.get("generated_at")
+    if not isinstance(generated_at, str):
+        raise ValueError("registry generated_at must be a string")
+
+    try:
+        generated_date = datetime.fromisoformat(
+            generated_at
+        ).date().isoformat()
+    except ValueError as exc:
+        raise ValueError(
+            "registry generated_at must be ISO 8601"
+        ) from exc
+
     rows: list[str] = []
     for doc in sorted(registry["documents"], key=lambda item: (str(item.get("type")), str(item.get("id")))):
         if doc.get("id") == "DOC-INDEX-GOVERDOCS":
@@ -16,14 +31,14 @@ def rebuild_index(root: Path, policy_path: Path) -> Path:
             f"[{doc.get('path')}]({doc.get('path')}) | `{doc.get('owner')}` |"
         )
     target = root / "DOCUMENTATION_INDEX.md"
-    frontmatter = """---
+    frontmatter = f"""---
 id: DOC-INDEX-GOVERDOCS
 type: documentation-index
 title: Documentation Index
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-19
+updated: {generated_date}
 version: 1.0.0
 canonical: true
 managed_by: agent
@@ -34,7 +49,7 @@ related:
   - GOV-0001
 source_refs:
   - PROJECT-STATE-GOVERDOCS
-last_verified: 2026-07-19
+last_verified: {generated_date}
 review_due: null
 ---
 """

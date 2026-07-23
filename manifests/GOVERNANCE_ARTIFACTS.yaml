@@ -10,3 +10,14 @@ artifacts:
     integrity:
       algorithm: sha256
       digest: ed44c6147049887d941b7497f1bce3b817f22b6ae00a5136a27365a2f688d918
+
+  - id: GOVERDOCS-LICENSE
+    path: LICENSE
+    type: legal-license
+    status: active
+    canonical: true
+    write_policy: immutable
+    introduced: 2026-07-23
+    integrity:
+      algorithm: sha256
+      digest: cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30

@@ -1,0 +1,12 @@
+version: 1
+artifacts:
+  - id: GOVERDOCS-CONSTITUTION
+    path: WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md
+    type: normative-technical-constitution
+    status: active
+    canonical: true
+    write_policy: immutable
+    introduced: 2026-07-23
+    integrity:
+      algorithm: sha256
+      digest: ed44c6147049887d941b7497f1bce3b817f22b6ae00a5136a27365a2f688d918

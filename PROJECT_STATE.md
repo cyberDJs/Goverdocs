@@ -5,7 +5,7 @@ title: GOVERDOCS Project State
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-19
+updated: 2026-07-23
 version: 1.0.0
 canonical: true
 managed_by: agent
@@ -17,7 +17,8 @@ related:
   - ARCH-0001
 source_refs:
   - SESSION-2026-07-19-01
-last_verified: 2026-07-19
+  - SESSION-2026-07-23-01
+last_verified: 2026-07-23
 review_due: null
 ---
 
@@ -30,6 +31,7 @@ review_due: null
 - Deterministic classification and planning: implemented
 - Metadata, relationship and local-link validation: implemented
 - Audit receipts: implemented
+- Normative technical constitution: integrated and checksum-locked
 - AI writer: not implemented
 - Canonical automatic write: disabled
 

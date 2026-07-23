@@ -17,6 +17,12 @@ project change
 
 LLM smí navrhovat obsah. **Nesmí být autoritou pro canonical zápis.**
 
+## Normativní technická ústava
+
+Soubor `WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md` je kanonická technická ústava projektu.
+
+Jeho integrita je deklarována v `manifests/GOVERNANCE_ARTIFACTS.yaml` a ověřována regresním testem. Soubor se nesmí měnit bez explicitního governance change control a aktualizace kanonického checksumu.
+
 ## V0.1
 
 - 45 pravidel rozhodovací matice,

@@ -26,6 +26,11 @@
       "type": "architecture-decision"
     },
     {
+      "id": "ADR-0003",
+      "path": "docs/decisions/governance/ADR-0003-open-source-governance-toolchain.md",
+      "type": "architecture-decision"
+    },
+    {
       "id": "EPIC-0001",
       "path": "docs/epics/active/EPIC-0001-governor-foundation.md",
       "type": "epic"
@@ -46,6 +51,11 @@
       "type": "review"
     },
     {
+      "id": "REV-0002",
+      "path": "docs/reviews/REV-0002-open-source-toolchain-readiness.md",
+      "type": "review"
+    },
+    {
       "id": "SEC-0001",
       "path": "docs/security/SEC-0001-trust-boundaries.md",
       "type": "security"
@@ -53,6 +63,11 @@
     {
       "id": "WB-0001",
       "path": "docs/work-blocks/active/WB-0001-foundation.md",
+      "type": "work-block"
+    },
+    {
+      "id": "WB-0002",
+      "path": "docs/work-blocks/active/WB-0002-open-source-governance-toolchain.md",
       "type": "work-block"
     },
     {
@@ -103,6 +118,21 @@
       "type": "related"
     },
     {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "ADR-0003",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "REV-0002",
+      "type": "related"
+    },
+    {
       "from": "ARCH-0001",
       "to": "ADR-0001",
       "type": "related"
@@ -148,8 +178,38 @@
       "type": "related"
     },
     {
+      "from": "ADR-0003",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0003",
+      "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0003",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0003",
+      "to": "REV-0002",
+      "type": "related"
+    },
+    {
       "from": "EPIC-0001",
       "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "EPIC-0001",
+      "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "EPIC-0001",
+      "to": "ADR-0003",
       "type": "related"
     },
     {
@@ -184,6 +244,16 @@
     },
     {
       "from": "OPS-0001",
+      "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "OPS-0001",
+      "to": "ADR-0003",
+      "type": "related"
+    },
+    {
+      "from": "OPS-0001",
       "to": "ARCH-0001",
       "type": "related"
     },
@@ -195,6 +265,26 @@
     {
       "from": "REV-0001",
       "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "REV-0002",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "REV-0002",
+      "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "REV-0002",
+      "to": "ADR-0003",
+      "type": "related"
+    },
+    {
+      "from": "REV-0002",
+      "to": "OPS-0001",
       "type": "related"
     },
     {
@@ -223,8 +313,33 @@
       "type": "related"
     },
     {
+      "from": "WB-0002",
+      "to": "EPIC-0001",
+      "type": "related"
+    },
+    {
+      "from": "WB-0002",
+      "to": "ADR-0003",
+      "type": "related"
+    },
+    {
+      "from": "WB-0002",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "WB-0002",
+      "to": "REV-0002",
+      "type": "related"
+    },
+    {
       "from": "ACTIVE-GOVERDOCS",
       "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "ACTIVE-GOVERDOCS",
+      "to": "WB-0002",
       "type": "related"
     },
     {
@@ -243,6 +358,21 @@
       "type": "related"
     },
     {
+      "from": "CTX-GOVERDOCS",
+      "to": "ADR-0003",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "REV-0002",
+      "type": "related"
+    },
+    {
       "from": "DEC-REG-GOVERDOCS",
       "to": "ADR-0001",
       "type": "related"
@@ -250,6 +380,11 @@
     {
       "from": "DEC-REG-GOVERDOCS",
       "to": "ADR-0002",
+      "type": "related"
+    },
+    {
+      "from": "DEC-REG-GOVERDOCS",
+      "to": "ADR-0003",
       "type": "related"
     },
     {
@@ -265,6 +400,11 @@
     {
       "from": "SESSION-GOVERDOCS",
       "to": "WB-0001",
+      "type": "related"
+    },
+    {
+      "from": "SESSION-GOVERDOCS",
+      "to": "WB-0002",
       "type": "related"
     }
   ]

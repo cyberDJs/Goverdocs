@@ -14,12 +14,14 @@ supersedes: null
 superseded_by: null
 related:
   - WB-0001
+  - WB-0002
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-19-02
   - SESSION-2026-07-23-01
   - SESSION-2026-07-23-02
   - SESSION-2026-07-24-01
+  - SESSION-2026-07-24-02
 last_verified: 2026-07-24
 review_due: null
 ---
@@ -69,3 +71,14 @@ review_due: null
 - Made registry, index and status-summary timestamps deterministic and source-derived.
 - Added CI repeated distribution builds, raw sdist payload comparison, canonical sdist archive metadata normalization, byte-for-byte reproducibility verification, strict metadata validation, clean-install smoke testing, runtime dependency inventory and retained release artifacts.
 - Prepared the `0.1.0` changelog; no tag or GitHub release was created.
+
+
+## SESSION-2026-07-24-02
+
+- Selected a deliberately small open-source governance toolchain integration.
+- Added a strict, build-only MkDocs Material documentation portal; no Pages deployment was enabled.
+- Added a GOVERDOCS-specific ADR template inspired by MADR without importing MADR runtime code.
+- Added REUSE 3.3 global licensing metadata, the canonical SPDX licence copy and a CI lint gate.
+- Added a separate SHA-pinned OpenSSF Scorecard workflow with SARIF reporting.
+- Recorded exact tool versions, licences, review boundaries and non-runtime status.
+- Canonical governance authority remains in GOVERDOCS; no automatic canonical write, tag or release was created.

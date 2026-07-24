@@ -35,6 +35,13 @@ release = [
   "build==1.5.0",
   "twine==6.2.0",
 ]
+docs = [
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.7",
+]
+compliance = [
+  "reuse[charset-normalizer]==6.2.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/nulleimy/Goverdocs"

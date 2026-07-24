@@ -22,6 +22,9 @@ documents:
   - EPIC-0001
   - ARCH-0001
   - ADR-0002
+  - ADR-0003
+  - WB-0002
+  - REV-0002
   supersedes: null
   superseded_by: null
 - id: ARCH-0001
@@ -63,15 +66,31 @@ documents:
   - OQ-GOVERDOCS
   supersedes: null
   superseded_by: null
+- id: ADR-0003
+  path: docs/decisions/governance/ADR-0003-open-source-governance-toolchain.md
+  type: architecture-decision
+  status: accepted
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-24
+  related:
+  - EPIC-0001
+  - WB-0002
+  - PROJECT-STATE-GOVERDOCS
+  - REV-0002
+  supersedes: null
+  superseded_by: null
 - id: EPIC-0001
   path: docs/epics/active/EPIC-0001-governor-foundation.md
   type: epic
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-24
   related:
   - WB-0001
+  - WB-0002
+  - ADR-0003
   - ADR-0001
   - ARCH-0001
   supersedes: null
@@ -95,9 +114,11 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-24
   related:
   - WB-0001
+  - WB-0002
+  - ADR-0003
   - ARCH-0001
   supersedes: null
   superseded_by: null
@@ -111,6 +132,20 @@ documents:
   related:
   - EPIC-0001
   - WB-0001
+  supersedes: null
+  superseded_by: null
+- id: REV-0002
+  path: docs/reviews/REV-0002-open-source-toolchain-readiness.md
+  type: review
+  status: in-review
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-24
+  related:
+  - EPIC-0001
+  - WB-0002
+  - ADR-0003
+  - OPS-0001
   supersedes: null
   superseded_by: null
 - id: SEC-0001
@@ -138,15 +173,30 @@ documents:
   - PROJECT-STATE-GOVERDOCS
   supersedes: null
   superseded_by: null
+- id: WB-0002
+  path: docs/work-blocks/active/WB-0002-open-source-governance-toolchain.md
+  type: work-block
+  status: active
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-24
+  related:
+  - EPIC-0001
+  - ADR-0003
+  - PROJECT-STATE-GOVERDOCS
+  - REV-0002
+  supersedes: null
+  superseded_by: null
 - id: ACTIVE-GOVERDOCS
   path: project-memory/ACTIVE_WORK.md
   type: active-work
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-19
+  updated: 2026-07-24
   related:
   - WB-0001
+  - WB-0002
   supersedes: null
   superseded_by: null
 - id: CTX-GOVERDOCS
@@ -160,6 +210,9 @@ documents:
   - PROJECT-STATE-GOVERDOCS
   - WB-0001
   - ADR-0002
+  - ADR-0003
+  - WB-0002
+  - REV-0002
   supersedes: null
   superseded_by: null
 - id: DEC-REG-GOVERDOCS
@@ -168,10 +221,11 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-23
+  updated: 2026-07-24
   related:
   - ADR-0001
   - ADR-0002
+  - ADR-0003
   supersedes: null
   superseded_by: null
 - id: OQ-GOVERDOCS
@@ -195,5 +249,6 @@ documents:
   updated: 2026-07-24
   related:
   - WB-0001
+  - WB-0002
   supersedes: null
   superseded_by: null

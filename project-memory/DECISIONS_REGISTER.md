@@ -5,7 +5,7 @@ title: Decisions Register
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-23
+updated: 2026-07-24
 version: 1.0.0
 canonical: true
 managed_by: mixed
@@ -15,10 +15,12 @@ superseded_by: null
 related:
   - ADR-0001
   - ADR-0002
+  - ADR-0003
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-23-02
-last_verified: 2026-07-23
+  - SESSION-2026-07-24-02
+last_verified: 2026-07-24
 review_due: null
 ---
 
@@ -35,3 +37,12 @@ review_due: null
 - Decision: GOVERDOCS is licensed under Apache License 2.0 (`Apache-2.0`).
 - Evidence: `LICENSE`, `manifests/GOVERNANCE_ARTIFACTS.yaml`
 - Record: `docs/decisions/governance/ADR-0002-apache-2-license.md`
+
+
+## ADR-0003 — Adopt the Initial Open-Source Governance Toolchain
+
+- Status: accepted
+- Date: 2026-07-24
+- Decision: adopt pinned MkDocs Material, a MADR-inspired GOVERDOCS template, REUSE compliance and OpenSSF Scorecard as bounded presentation and evidence tools.
+- Boundary: no new runtime dependencies, no automatic documentation deployment and no canonical-write authority for external tools.
+- Record: `docs/decisions/governance/ADR-0003-open-source-governance-toolchain.md`

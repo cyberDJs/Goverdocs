@@ -7,6 +7,7 @@
 **Rozpoznej dopad změny. Naplánuj řízenou aktualizaci. Ověř pravidla. Zachovej auditní stopu.**
 
 [![Quality](https://github.com/nulleimy/Goverdocs/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/nulleimy/Goverdocs/actions/workflows/quality.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/nulleimy/Goverdocs/badge)](https://scorecard.dev/viewer/?uri=github.com/nulleimy/Goverdocs)
 ![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB?logo=python&logoColor=white)
 [![License](https://img.shields.io/badge/License-Apache--2.0-2ea44f)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-release%20candidate-f0ad4e)](PROJECT_STATE.md)
@@ -96,6 +97,9 @@ canonical obsah.
 | Auditní receipts | Dostupné | Ukládá výsledek `validate` a `health` |
 | Deterministický rebuild | Dostupné | Regeneruje index a manifesty bez závislosti na wall-clock čase |
 | Reprodukovatelné balíky | Dostupné | Ověřuje canonical sdist, wheel, licence a runtime závislosti |
+| Dokumentační portál | Dostupné pro build | Vytváří striktně ověřený statický web bez automatického nasazení |
+| REUSE compliance | Dostupné v CI | Ověřuje SPDX licenci a copyright pro každý sledovaný soubor |
+| OpenSSF Scorecard | Dostupné v CI | Publikuje supply-chain bezpečnostní nálezy jako SARIF |
 | AI writer | Neimplementováno | Budoucí draftovací vrstva |
 | Autonomní canonical write | Zakázáno | `apply` v0.1 záměrně neexistuje |
 
@@ -281,6 +285,31 @@ manifests/DOCUMENT_STATUS_SUMMARY.json
 Výstupy jsou deterministické a jejich `generated_at` je odvozen z metadata
 řízených dokumentů, ne z okamžiku spuštění příkazu.
 
+## Open-source governance toolchain
+
+GOVERDOCS používá existující open-source nástroje jako ověřovací a prezentační
+vrstvy. Kanonická pravidla, rozhodovací matice, metadata a vztahy zůstávají
+v tomto repozitáři; externí nástroje jejich autoritu nenahrazují.
+
+| Nástroj | Role | Hranice |
+|---|---|---|
+| MkDocs + Material for MkDocs | Statický dokumentační portál | Build-only; GitHub Pages se nenasazuje automaticky |
+| MADR | Inspirovaná struktura ADR šablony | GOVERDOCS používá vlastní metadata, approval a evidence sekce |
+| REUSE | Strojově ověřitelná licenční compliance | Vývojový/CI nástroj, není runtime závislostí balíku |
+| OpenSSF Scorecard | Bezpečnostní kontrola repozitáře a supply chain | Samostatný read-only workflow se SARIF výsledkem |
+
+Lokální ověření:
+
+```bash
+python -m pip install -e '.[docs,compliance]'
+mkdocs build --strict
+reuse lint
+```
+
+Zdrojová dokumentace portálu je v `site-docs/`, výsledný adresář `site/` je
+ignorovaný build artefakt. Přehled verzí, licencí a adopčních hranic je v
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
 ## Mapa repozitáře
 
 ```text
@@ -295,10 +324,15 @@ docs/security/          Trust boundaries a bezpečnostní pravidla
 docs/work-blocks/       Řízené implementační jednotky
 manifests/              Registry, grafy a souhrny
 project-memory/         Kontext, aktivní práce, rozhodnutí a session log
+site-docs/              Prezentační zdroje statického dokumentačního portálu
 schemas/                JSON Schema kontrakty
+templates/              Opakovaně použitelné šablony, včetně MADR-compatible ADR
+LICENSES/               SPDX licenční texty pro REUSE
 scripts/                Bootstrap a release verification
 src/goverdocs/          Python CLI a governance jádro
 tests/                  Unit a regresní testy
+mkdocs.yml              Striktní build konfigurace dokumentačního portálu
+REUSE.toml              Globální SPDX přiřazení pro licenční compliance
 ```
 
 ## Release integrita
@@ -378,6 +412,9 @@ které vyžadují explicitní schválení.
 | Auditní receipts | Implementováno |
 | Deterministické registry | Implementováno |
 | Reprodukovatelné distribuce | Implementováno |
+| Dokumentační portál | Build a CI kontrola implementovány; deployment vypnut |
+| REUSE compliance | Implementováno v CI |
+| OpenSSF Scorecard | Samostatný workflow implementován |
 | AI writer | Neimplementováno |
 | Controlled canonical writer | Neimplementováno |
 | Autonomní `apply` | Záměrně nedostupné |
@@ -398,6 +435,8 @@ Aktuální exit criteria a ověřený stav jsou vedeny v
 | [`ADR-0001`](docs/decisions/architecture/ADR-0001-deterministic-governor-first.md) | Rozhodnutí začít deterministickým governorem |
 | [`ADR-0002`](docs/decisions/governance/ADR-0002-apache-2-license.md) | Rozhodnutí o Apache-2.0 |
 | [`CHANGELOG.md`](CHANGELOG.md) | Historie významných změn |
+| [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) | Verze, licence a hranice převzatých nástrojů |
+| [`templates/adr/MADR_GOVERDOCS_TEMPLATE.md`](templates/adr/MADR_GOVERDOCS_TEMPLATE.md) | GOVERDOCS ADR šablona inspirovaná MADR |
 
 ## Normativní technická ústava
 

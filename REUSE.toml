@@ -1,0 +1,16 @@
+version = 1
+SPDX-PackageName = "GOVERDOCS"
+SPDX-PackageSupplier = "Eimy Herrer"
+SPDX-PackageDownloadLocation = "https://github.com/nulleimy/Goverdocs"
+
+[[annotations]]
+path = ["*", "**/*"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Eimy Herrer"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["LICENSE", "LICENSES/Apache-2.0.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "Apache-2.0"

@@ -6,7 +6,7 @@ status: active
 owner: GOVERDOCS
 created: 2026-07-19
 updated: 2026-07-24
-version: 1.0.0
+version: 1.1.0
 canonical: true
 managed_by: agent
 write_policy: automatic
@@ -25,6 +25,7 @@ source_refs:
   - SESSION-2026-07-23-02
   - SESSION-2026-07-24-01
   - SESSION-2026-07-24-02
+  - SESSION-2026-07-24-03
 last_verified: 2026-07-24
 review_due: null
 ---
@@ -47,6 +48,7 @@ review_due: null
 - Licence compliance: REUSE 3.3 metadata and CI lint implemented
 - Repository security: SHA-pinned OpenSSF Scorecard workflow with SARIF reporting implemented
 - ADR authoring: GOVERDOCS-specific MADR-compatible template added
+- Open-source toolchain readiness: accepted for commit `3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1`; exact-SHA `quality` and OpenSSF Scorecard runs succeeded and produced the expected retained artifacts
 - AI writer: not implemented
 - Canonical automatic write: disabled
 

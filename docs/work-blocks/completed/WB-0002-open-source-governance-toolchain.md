@@ -2,11 +2,11 @@
 id: WB-0002
 type: work-block
 title: Integrate the Initial Open-Source Governance Toolchain
-status: active
+status: completed
 owner: GOVERDOCS
 created: 2026-07-24
 updated: 2026-07-24
-version: 1.0.0
+version: 1.1.0
 canonical: true
 managed_by: mixed
 write_policy: automatic
@@ -19,6 +19,7 @@ related:
   - REV-0002
 source_refs:
   - SESSION-2026-07-24-02
+  - SESSION-2026-07-24-03
 last_verified: 2026-07-24
 review_due: null
 ---
@@ -57,6 +58,18 @@ changing GOVERDOCS runtime behaviour or canonical-write boundaries.
 - documentation artifacts build without modifying tracked files,
 - generated governance artifacts are deterministic and current,
 - Git diff is restricted to the reviewed integration scope.
+
+## Completion evidence
+
+- implementation commit:
+  `3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1`,
+- local verification: 31 tests, validation, health, strict documentation build,
+  REUSE lint, reproducible package gates and clean-install audit passed,
+- remote verification: GitHub Actions runs `30082659680` and `30082659625`
+  completed successfully for the exact implementation commit,
+- readiness review: REV-0002 accepted,
+- no tag, release, automatic deployment or canonical-write capability was
+  introduced.
 
 ## Rollback
 

@@ -2,11 +2,11 @@
 id: REV-0002
 type: review
 title: Open-Source Governance Toolchain Readiness Review
-status: in-review
+status: accepted
 owner: GOVERDOCS
 created: 2026-07-24
 updated: 2026-07-24
-version: 1.0.0
+version: 1.1.0
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -19,8 +19,9 @@ related:
   - OPS-0001
 source_refs:
   - SESSION-2026-07-24-02
+  - SESSION-2026-07-24-03
 last_verified: 2026-07-24
-review_due: null
+review_due: 2026-10-01
 ---
 
 # REV-0002: Open-Source Governance Toolchain Readiness Review
@@ -30,31 +31,46 @@ review_due: null
 Review the first bounded integration of MkDocs Material, a MADR-inspired ADR
 template, REUSE compliance and OpenSSF Scorecard.
 
-## Verified in patch preparation
+## Verified implementation evidence
 
-- canonical technical constitution checksum was verified,
-- exact existing-file base blobs were reconstructed and matched GitHub,
-- the patch applies cleanly to the expected README redesign state in a
-  synthetic repository,
-- new TOML, YAML and JSON configuration parses successfully,
-- focused static regression tests pass,
-- generated index, registry, relationship graph and status summary are
-  internally consistent,
-- no runtime dependency was added to the base package.
+- implementation commit:
+  `3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1`,
+- canonical local recovery and verification completed without commit, push, tag
+  or release side effects,
+- Ruff and mypy passed,
+- the complete pytest suite passed with 31 tests,
+- `goverdocs validate` passed,
+- `goverdocs health` passed with 19 governed documents and 0 issues,
+- deterministic `rebuild-index` idempotence passed,
+- `mkdocs build --strict` passed,
+- `reuse lint` passed with 99 of 99 files covered,
+- repeated package builds, canonical sdist verification, strict Twine checks,
+  clean wheel installation, `pip check` and runtime dependency audit passed.
 
-## Pending verification in the canonical local repository
+## Verified remote evidence
 
-- Ruff and mypy,
-- the complete pytest suite,
-- GOVERDOCS validation and health,
-- deterministic `rebuild-index` no-diff check,
-- `mkdocs build --strict`,
-- `reuse lint`,
-- package build and strict Twine metadata check,
-- GitHub Actions and Scorecard execution after a separately approved push.
+- GitHub Actions `quality` run
+  [30082659680](https://github.com/nulleimy/Goverdocs/actions/runs/30082659680)
+  completed successfully for the exact implementation commit,
+- Python 3.11, 3.12 and 3.13 verification jobs completed successfully,
+- `package / sdist + wheel` completed successfully,
+- `governance toolchain` completed successfully,
+- OpenSSF Scorecard run
+  [30082659625](https://github.com/nulleimy/Goverdocs/actions/runs/30082659625)
+  completed successfully,
+- Code Scanning SARIF upload completed successfully,
+- retained artifacts were verified:
+  `goverdocs-site-3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1`
+  (627535 bytes),
+  `goverdocs-3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1`
+  (66165 bytes), and `openssf-scorecard-sarif` (16825 bytes),
+- local `main`, `origin/main` and the GitHub remote ref were synchronized at
+  the exact implementation commit,
+- no tag or GitHub release was created.
 
 ## Decision
 
-Status remains `in-review`. It may become `accepted` only after the canonical
-local gates and the remote CI run for the exact committed SHA succeed. Failure
-of any gate blocks completion and requires either a focused fix or rollback.
+Status is `accepted`. All acceptance criteria for WB-0002 are supported by
+local and remote evidence for the exact implementation commit. Material for
+MkDocs remains subject to the reassessment date recorded by ADR-0003; automatic
+documentation deployment, canonical writes, tags and releases remain disabled.

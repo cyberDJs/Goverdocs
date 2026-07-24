@@ -67,7 +67,7 @@
     },
     {
       "id": "WB-0002",
-      "path": "docs/work-blocks/active/WB-0002-open-source-governance-toolchain.md",
+      "path": "docs/work-blocks/completed/WB-0002-open-source-governance-toolchain.md",
       "type": "work-block"
     },
     {
@@ -335,11 +335,6 @@
     {
       "from": "ACTIVE-GOVERDOCS",
       "to": "WB-0001",
-      "type": "related"
-    },
-    {
-      "from": "ACTIVE-GOVERDOCS",
-      "to": "WB-0002",
       "type": "related"
     },
     {

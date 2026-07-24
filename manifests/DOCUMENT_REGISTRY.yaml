@@ -137,7 +137,7 @@ documents:
 - id: REV-0002
   path: docs/reviews/REV-0002-open-source-toolchain-readiness.md
   type: review
-  status: in-review
+  status: accepted
   canonical: true
   owner: GOVERDOCS
   updated: 2026-07-24
@@ -174,9 +174,9 @@ documents:
   supersedes: null
   superseded_by: null
 - id: WB-0002
-  path: docs/work-blocks/active/WB-0002-open-source-governance-toolchain.md
+  path: docs/work-blocks/completed/WB-0002-open-source-governance-toolchain.md
   type: work-block
-  status: active
+  status: completed
   canonical: true
   owner: GOVERDOCS
   updated: 2026-07-24
@@ -196,7 +196,6 @@ documents:
   updated: 2026-07-24
   related:
   - WB-0001
-  - WB-0002
   supersedes: null
   superseded_by: null
 - id: CTX-GOVERDOCS

@@ -6,7 +6,7 @@ status: active
 owner: GOVERDOCS
 created: 2026-07-19
 updated: 2026-07-24
-version: 1.0.0
+version: 1.1.0
 canonical: true
 managed_by: mixed
 write_policy: append-only
@@ -22,6 +22,7 @@ source_refs:
   - SESSION-2026-07-23-02
   - SESSION-2026-07-24-01
   - SESSION-2026-07-24-02
+  - SESSION-2026-07-24-03
 last_verified: 2026-07-24
 review_due: null
 ---
@@ -82,3 +83,13 @@ review_due: null
 - Added a separate SHA-pinned OpenSSF Scorecard workflow with SARIF reporting.
 - Recorded exact tool versions, licences, review boundaries and non-runtime status.
 - Canonical governance authority remains in GOVERDOCS; no automatic canonical write, tag or release was created.
+
+## SESSION-2026-07-24-03
+
+- Recovered the initial integration from the deterministic generated-artifact mismatch and verified the corrected source-of-truth relationships.
+- Verified Ruff, mypy, 31 tests, GOVERDOCS validation and health, deterministic index generation, strict MkDocs build, REUSE compliance, reproducible package gates, clean installation and dependency closure.
+- Committed the integration as `3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1` and synchronized local `main`, `origin/main` and the GitHub remote ref.
+- Verified GitHub Actions `quality` run `30082659680`, including Python 3.11, 3.12 and 3.13, package and governance-toolchain jobs.
+- Verified OpenSSF Scorecard run `30082659625`, Code Scanning SARIF upload and all expected retained artifacts.
+- Accepted REV-0002 and completed WB-0002.
+- No tag or GitHub release was created.

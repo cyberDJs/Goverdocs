@@ -108,14 +108,23 @@ def test_governance_records_and_generated_artifacts_are_current() -> None:
     index = (ROOT / "DOCUMENTATION_INDEX.md").read_text(encoding="utf-8")
 
     assert documents["ADR-0003"]["status"] == "accepted"
-    assert documents["WB-0002"]["status"] == "active"
+    assert documents["REV-0002"]["status"] == "accepted"
+    assert documents["WB-0002"]["status"] == "completed"
+    assert documents["WB-0002"]["path"] == (
+        "docs/work-blocks/completed/"
+        "WB-0002-open-source-governance-toolchain.md"
+    )
     assert status == {
         "generated_at": "2026-07-24T00:00:00+00:00",
         "document_count": 19,
-        "status_counts": {"accepted": 4, "active": 14, "in-review": 1},
+        "status_counts": {"accepted": 5, "active": 13, "completed": 1},
     }
     node_ids = {node["id"] for node in graph["nodes"]}
     assert {"ADR-0003", "WB-0002", "REV-0002"} <= node_ids
     assert "`ADR-0003`" in index
-    assert "`WB-0002`" in index
     assert "`REV-0002`" in index
+    assert (
+        "[docs/work-blocks/completed/"
+        "WB-0002-open-source-governance-toolchain.md]"
+    ) in index
+    assert "docs/work-blocks/active/WB-0002-open-source-governance-toolchain.md" not in index

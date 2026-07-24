@@ -6,7 +6,8 @@
 - added a GOVERDOCS-specific ADR template inspired by MADR,
 - added REUSE 3.3 compliance metadata and CI linting,
 - added a SHA-pinned OpenSSF Scorecard workflow with SARIF reporting,
-- recorded third-party versions, licences and adoption boundaries.
+- recorded third-party versions, licences and adoption boundaries,
+- accepted exact-SHA local and remote readiness evidence and completed WB-0002.
 
 ## 0.1.0 — 2026-07-24
 

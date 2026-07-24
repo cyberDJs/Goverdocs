@@ -5,7 +5,7 @@ title: Documentation Index
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-23
+updated: 2026-07-24
 version: 1.0.0
 canonical: true
 managed_by: agent
@@ -16,7 +16,7 @@ related:
   - GOV-0001
 source_refs:
   - PROJECT-STATE-GOVERDOCS
-last_verified: 2026-07-23
+last_verified: 2026-07-24
 review_due: null
 ---
 

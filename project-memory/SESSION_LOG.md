@@ -5,7 +5,7 @@ title: Session Log
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-23
+updated: 2026-07-24
 version: 1.0.0
 canonical: true
 managed_by: mixed
@@ -16,7 +16,11 @@ related:
   - WB-0001
 source_refs:
   - SESSION-2026-07-19-01
-last_verified: 2026-07-23
+  - SESSION-2026-07-19-02
+  - SESSION-2026-07-23-01
+  - SESSION-2026-07-23-02
+  - SESSION-2026-07-24-01
+last_verified: 2026-07-24
 review_due: null
 ---
 
@@ -54,3 +58,14 @@ review_due: null
 - Refreshed generated-index and append-only registry verification metadata.
 - Updated project state, context, decision register and open-question evidence.
 - No push, tag or release was performed.
+
+## SESSION-2026-07-24-01
+
+- Verified two successful GitHub Actions `quality` push runs for commit `cc4d20d7640895e238ab35bdadacccc8b7b6722e`.
+- Built and inspected `goverdocs-0.1.0` sdist and wheel in a temporary environment.
+- Verified a clean wheel installation, `pip check`, GOVERDOCS health and repository invariants.
+- Added PEP 639 licence metadata and pinned the setuptools build backend.
+- Removed the unnecessary `jsonschema[format]` runtime extra.
+- Made registry, index and status-summary timestamps deterministic and source-derived.
+- Added CI repeated distribution builds, raw sdist payload comparison, canonical sdist archive metadata normalization, byte-for-byte reproducibility verification, strict metadata validation, clean-install smoke testing, runtime dependency inventory and retained release artifacts.
+- Prepared the `0.1.0` changelog; no tag or GitHub release was created.

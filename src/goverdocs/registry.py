@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, time
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +23,35 @@ def governed_documents(root: Path, policy_path: Path) -> list[Path]:
     return sorted(result)
 
 
+def _deterministic_generated_at(
+    documents: list[dict[str, Any]],
+) -> str:
+    """Derive a stable UTC timestamp from governed source metadata."""
+    if not documents:
+        return "1970-01-01T00:00:00+00:00"
+
+    updated_dates: list[date] = []
+    for document in documents:
+        raw_updated = document.get("updated")
+        if not isinstance(raw_updated, str):
+            raise ValueError(
+                "registry document updated must be an ISO date string"
+            )
+        try:
+            updated_dates.append(date.fromisoformat(raw_updated))
+        except ValueError as exc:
+            raise ValueError(
+                "registry document updated must be an ISO date string"
+            ) from exc
+
+    latest = max(updated_dates)
+    return datetime.combine(
+        latest,
+        time.min,
+        tzinfo=UTC,
+    ).isoformat(timespec="seconds")
+
+
 def build_registry(root: Path, policy_path: Path) -> dict[str, Any]:
     documents: list[dict[str, Any]] = []
     for path in governed_documents(root, policy_path):
@@ -38,7 +67,10 @@ def build_registry(root: Path, policy_path: Path) -> dict[str, Any]:
             "updated": meta.get("updated"), "related": meta.get("related", []),
             "supersedes": meta.get("supersedes"), "superseded_by": meta.get("superseded_by"),
         })
-    return {"generated_at": datetime.now(UTC).isoformat(timespec="seconds"), "documents": documents}
+    return {
+        "generated_at": _deterministic_generated_at(documents),
+        "documents": documents,
+    }
 
 
 def write_registry(root: Path, policy_path: Path) -> dict[str, Any]:

@@ -1,4 +1,4 @@
-generated_at: 2026-07-23T16:48:28+00:00
+generated_at: 2026-07-24T00:00:00+00:00
 documents:
 - id: DOC-INDEX-GOVERDOCS
   path: DOCUMENTATION_INDEX.md
@@ -6,7 +6,7 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-23
+  updated: 2026-07-24
   related:
   - GOV-0001
   supersedes: null
@@ -17,7 +17,7 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-23
+  updated: 2026-07-24
   related:
   - EPIC-0001
   - ARCH-0001
@@ -155,7 +155,7 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-23
+  updated: 2026-07-24
   related:
   - PROJECT-STATE-GOVERDOCS
   - WB-0001
@@ -192,7 +192,7 @@ documents:
   status: active
   canonical: true
   owner: GOVERDOCS
-  updated: 2026-07-23
+  updated: 2026-07-24
   related:
   - WB-0001
   supersedes: null

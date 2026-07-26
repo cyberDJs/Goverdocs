@@ -2,11 +2,11 @@
 id: PRODUCT-MODE-GOVERDOCS
 type: product-decision-execution-operating-mode
 title: Product, Decision and Execution Operating Mode
-status: proposed
+status: active
 owner: GOVERDOCS
 created: 2026-07-26
 updated: 2026-07-26
-version: 0.1.1
+version: 1.0.0
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -20,7 +20,8 @@ related:
   - PROJECT-STATE-GOVERDOCS
 source_refs:
   - SESSION-2026-07-26-01
-last_verified: null
+  - SESSION-2026-07-26-02
+last_verified: 2026-07-26
 review_due: 2026-08-15
 ---
 
@@ -28,7 +29,7 @@ review_due: 2026-08-15
 
 ## 0. Normativní hranice
 
-Tento dokument je `PROPOSED` operating mode podřízený:
+Tento dokument je `ACTIVE` operating mode podřízený:
 
 1. `WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md`,
 2. `GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md`.
@@ -402,3 +403,12 @@ předpoklady, nejistotu a požadovanou lidskou kontrolu.
 
 AI nesmí sama schválit návrh, risk acceptance, canonical write ani produktový
 dopad. Hranice dalších operací určuje koordinační rámec a WORLD.
+
+## 18. Acceptance evidence
+
+Operating mode `1.0.0` je aktivní pouze v rozsahu vymezeném constitutional
+frameworkem a WORLD. Přijetí je navázáno na exact-SHA commit `6236a8cae777063811b41ae00fb36f819f8468e7`,
+quality run `30191576044`, OpenSSF Scorecard run `30191576042` a artefaktové
+digesty zaznamenané v `REV-0003`.
+
+Tento stav nedokazuje adopci, produktový dopad, release ani deployment.

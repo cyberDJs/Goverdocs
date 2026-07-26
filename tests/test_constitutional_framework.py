@@ -44,6 +44,7 @@ def test_change_gate_schema_and_contract() -> None:
     assert len(dimension_ids) == len(set(dimension_ids))
     assert gate["approval_gate_reference"] == APPROVAL_GATE_REFERENCE
     assert tuple(gate["reporting_requires"]) == REQUIRED_REPORTING_FIELDS
+    assert gate["status"] == "active"
     assert gate["enforcement"] == "warn-only"
 
 
@@ -89,7 +90,7 @@ def test_manifest_checksums_match_all_framework_artifacts() -> None:
     assert expected <= set(by_path)
     for relative in expected:
         artifact = by_path[relative]
-        assert artifact["status"] == "proposed"
+        assert artifact["status"] == "active"
         assert artifact["write_policy"] == "approval-required"
         assert artifact["integrity"]["algorithm"] == "sha256"
         assert artifact["integrity"]["digest"] == hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()

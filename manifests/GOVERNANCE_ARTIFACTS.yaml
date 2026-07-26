@@ -25,40 +25,40 @@ artifacts:
   - id: GOVERDOCS-CONSTITUTIONAL-FRAMEWORK
     path: GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
     type: constitutional-framework
-    status: proposed
+    status: active
     canonical: true
     write_policy: approval-required
     introduced: 2026-07-26
     integrity:
       algorithm: sha256
-      digest: 58eacf4ccd0a64fbaf2f6354cd2f0069abaae36f1353d93088fddb23c3bc1cdf
+      digest: 06904275f4cf13b1e2e2f393e4e2452c2cdc3097e1e3c8527591695f7a86453e
 
   - id: GOVERDOCS-PRODUCT-OPERATING-MODE
     path: PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
     type: normative-product-operating-mode
-    status: proposed
+    status: active
     canonical: true
     write_policy: approval-required
     introduced: 2026-07-26
     integrity:
       algorithm: sha256
-      digest: 0cb3a631205e75ef3e37e3992f3ea68f3adebb22a49122bfb4a09ad29b7cb835
+      digest: cad1711f65db016594ddc3fcd1583d84e1a74a494ff086358bf80ef75b91b01a
 
   - id: GOVERDOCS-CHANGE-GATE-10-OF-10
     path: policies/CHANGE_GATE_10_OF_10.yaml
     type: constitutional-change-gate
-    status: proposed
+    status: active
     canonical: true
     write_policy: approval-required
     introduced: 2026-07-26
     integrity:
       algorithm: sha256
-      digest: b2dff9a7365983b142ffdfe208f824d663ad34e3742bd33f4397d58316d72c71
+      digest: 99dd2053d67fd20fd94ae241be636a0881a3845a0c81579597b3945f0ea4f02c
 
   - id: GOVERDOCS-CHANGE-GATE-SCHEMA
     path: schemas/change-gate.schema.json
     type: governance-schema
-    status: proposed
+    status: active
     canonical: true
     write_policy: approval-required
     introduced: 2026-07-26

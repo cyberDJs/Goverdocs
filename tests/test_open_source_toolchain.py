@@ -110,24 +110,26 @@ def test_governance_records_and_generated_artifacts_are_current() -> None:
     assert documents["ADR-0003"]["status"] == "accepted"
     assert documents["REV-0002"]["status"] == "accepted"
     assert documents["WB-0002"]["status"] == "completed"
-    assert documents["ADR-0004"]["status"] == "proposed"
-    assert documents["WB-0003"]["status"] == "active"
-    assert documents["REV-0003"]["status"] == "in-review"
-    assert documents["CONST-FRAMEWORK-GOVERDOCS"]["status"] == "proposed"
-    assert documents["PRODUCT-MODE-GOVERDOCS"]["status"] == "proposed"
+    assert documents["ADR-0004"]["status"] == "accepted"
+    assert documents["WB-0003"]["status"] == "completed"
+    assert documents["REV-0003"]["status"] == "accepted"
+    assert documents["CONST-FRAMEWORK-GOVERDOCS"]["status"] == "active"
+    assert documents["PRODUCT-MODE-GOVERDOCS"]["status"] == "active"
     assert documents["WB-0002"]["path"] == (
         "docs/work-blocks/completed/"
         "WB-0002-open-source-governance-toolchain.md"
+    )
+    assert documents["WB-0003"]["path"] == (
+        "docs/work-blocks/completed/"
+        "WB-0003-constitutional-framework.md"
     )
     assert status == {
         "generated_at": "2026-07-26T00:00:00+00:00",
         "document_count": 24,
         "status_counts": {
-            "accepted": 5,
-            "active": 14,
-            "completed": 1,
-            "in-review": 1,
-            "proposed": 3,
+            "accepted": 7,
+            "active": 15,
+            "completed": 2,
         },
     }
     node_ids = {node["id"] for node in graph["nodes"]}
@@ -152,4 +154,9 @@ def test_governance_records_and_generated_artifacts_are_current() -> None:
         "[docs/work-blocks/completed/"
         "WB-0002-open-source-governance-toolchain.md]"
     ) in index
+    assert (
+        "[docs/work-blocks/completed/"
+        "WB-0003-constitutional-framework.md]"
+    ) in index
     assert "docs/work-blocks/active/WB-0002-open-source-governance-toolchain.md" not in index
+    assert "docs/work-blocks/active/WB-0003-constitutional-framework.md" not in index

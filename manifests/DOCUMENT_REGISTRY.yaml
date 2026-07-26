@@ -14,7 +14,7 @@ documents:
 - id: CONST-FRAMEWORK-GOVERDOCS
   path: GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
   type: governance-constitution-framework
-  status: proposed
+  status: active
   canonical: true
   owner: GOVERDOCS
   updated: 2026-07-26
@@ -29,7 +29,7 @@ documents:
 - id: PRODUCT-MODE-GOVERDOCS
   path: PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
   type: product-decision-execution-operating-mode
-  status: proposed
+  status: active
   canonical: true
   owner: GOVERDOCS
   updated: 2026-07-26
@@ -118,7 +118,7 @@ documents:
 - id: ADR-0004
   path: docs/decisions/governance/ADR-0004-constitutional-framework.md
   type: architecture-decision
-  status: proposed
+  status: accepted
   canonical: true
   owner: GOVERDOCS
   updated: 2026-07-26
@@ -201,7 +201,7 @@ documents:
 - id: REV-0003
   path: docs/reviews/REV-0003-constitutional-framework-readiness.md
   type: review
-  status: in-review
+  status: accepted
   canonical: true
   owner: GOVERDOCS
   updated: 2026-07-26
@@ -237,21 +237,6 @@ documents:
   - PROJECT-STATE-GOVERDOCS
   supersedes: null
   superseded_by: null
-- id: WB-0003
-  path: docs/work-blocks/active/WB-0003-constitutional-framework.md
-  type: work-block
-  status: active
-  canonical: true
-  owner: GOVERDOCS
-  updated: 2026-07-26
-  related:
-  - CONST-FRAMEWORK-GOVERDOCS
-  - PRODUCT-MODE-GOVERDOCS
-  - ADR-0004
-  - REV-0003
-  - PROJECT-STATE-GOVERDOCS
-  supersedes: null
-  superseded_by: null
 - id: WB-0002
   path: docs/work-blocks/completed/WB-0002-open-source-governance-toolchain.md
   type: work-block
@@ -266,6 +251,21 @@ documents:
   - REV-0002
   supersedes: null
   superseded_by: null
+- id: WB-0003
+  path: docs/work-blocks/completed/WB-0003-constitutional-framework.md
+  type: work-block
+  status: completed
+  canonical: true
+  owner: GOVERDOCS
+  updated: 2026-07-26
+  related:
+  - CONST-FRAMEWORK-GOVERDOCS
+  - PRODUCT-MODE-GOVERDOCS
+  - ADR-0004
+  - REV-0003
+  - PROJECT-STATE-GOVERDOCS
+  supersedes: null
+  superseded_by: null
 - id: ACTIVE-GOVERDOCS
   path: project-memory/ACTIVE_WORK.md
   type: active-work
@@ -275,7 +275,6 @@ documents:
   updated: 2026-07-26
   related:
   - WB-0001
-  - WB-0003
   supersedes: null
   superseded_by: null
 - id: CTX-GOVERDOCS

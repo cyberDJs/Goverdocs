@@ -2,11 +2,11 @@
 id: CONST-FRAMEWORK-GOVERDOCS
 type: governance-constitution-framework
 title: GOVERDOCS Constitutional Framework
-status: proposed
+status: active
 owner: GOVERDOCS
 created: 2026-07-26
 updated: 2026-07-26
-version: 0.1.1
+version: 1.0.0
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -20,7 +20,8 @@ related:
   - GOV-0001
 source_refs:
   - SESSION-2026-07-26-01
-last_verified: null
+  - SESSION-2026-07-26-02
+last_verified: 2026-07-26
 review_due: 2026-08-15
 ---
 
@@ -28,14 +29,13 @@ review_due: 2026-08-15
 
 ## 0. Normativní stav
 
-Tento dokument je `PROPOSED` koordinační rámec. Doplňuje, ale nemění ani
+Tento dokument je `ACTIVE` koordinační rámec. Doplňuje, ale nemění ani
 nenahrazuje soubor `WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md`.
 
-Přijetí tohoto rámce do aktivní canonical governance nesmí být označeno jako
-`APPROVED` bez explicitního schválení. Lokální aplikace smí být označena jako
-`IMPLEMENTED` pouze pro přesně určený worktree. Stav `VERIFIED` vyžaduje
-konkrétní testovací důkazy; vzdálená verifikace vyžaduje commit, samostatně
-schválený push a CI nad přesným SHA.
+Rámec byl přijat pro `warn-only` režim po odděleně schválené implementaci,
+commitu a pushi a po úspěšném CI nad přesným SHA
+`6236a8cae777063811b41ae00fb36f819f8468e7`. Aktivní stav neznamená tag, release, deployment, adopci ani
+ověřený produktový dopad.
 
 ## 1. Hlavní operační invariant
 
@@ -302,3 +302,21 @@ NEXT SAFE STEP:
 
 Tento rozšířený blok doplňuje minimální blok vyžadovaný WORLD. Při konfliktu
 platí WORLD.
+
+## 13. Acceptance evidence
+
+Aktivace `1.0.0` je omezena na `warn-only` governance scope a je doložena:
+
+- exact-SHA commit: `6236a8cae777063811b41ae00fb36f819f8468e7`,
+- quality run `30191576044`: Python 3.11, 3.12 a 3.13, Ruff, mypy, pytest,
+  dokumentační validace a health, reprodukovatelné sdist/wheel buildy, metadata,
+  clean-install audit, MkDocs a REUSE — vše `success`,
+- OpenSSF Scorecard run `30191576042` — `success`, včetně SARIF a Code
+  Scanning uploadu,
+- package artifact `8628731800` SHA-256 `dcbcb253584d86bedc53f145f5461bb1283a6382b0f405cc5cc853cf9b4ce2ab`,
+- documentation artifact `8628731425` SHA-256 `0ec8927f162e5191727833d5df8daeb0113c577f8e24a50a1dd1b78209429874`,
+- SARIF artifact `8628727141` SHA-256 `ea7a2f955989d7c6ce2df137c8a18e0cf311ef717740d180507a7e0ea7ebac93`,
+- nezměněný WORLD SHA-256 `ed44c6147049887d941b7497f1bce3b817f22b6ae00a5136a27365a2f688d918`.
+
+Tag, release, deployment, adopce a produktový dopad nejsou součástí tohoto
+přijetí a zůstávají samostatnými approval gates nebo následnými důkazy.

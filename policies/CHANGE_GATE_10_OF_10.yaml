@@ -1,10 +1,10 @@
 schema_version: 1
-policy_version: 0.1.1
+policy_version: 1.0.0
 created: "2026-07-26"
 updated: "2026-07-26"
 review_due: "2026-08-15"
 id: GATE-10-OF-10
-status: proposed
+status: active
 enforcement: warn-only
 owner: GOVERDOCS
 normative_parent: CONST-FRAMEWORK-GOVERDOCS

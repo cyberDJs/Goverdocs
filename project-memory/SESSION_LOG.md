@@ -6,7 +6,7 @@ status: active
 owner: GOVERDOCS
 created: 2026-07-19
 updated: 2026-07-26
-version: 1.2.0
+version: 1.3.0
 canonical: true
 managed_by: mixed
 write_policy: append-only
@@ -27,7 +27,8 @@ source_refs:
   - SESSION-2026-07-24-02
   - SESSION-2026-07-24-03
   - SESSION-2026-07-26-01
-last_verified: null
+  - SESSION-2026-07-26-02
+last_verified: 2026-07-26
 review_due: null
 ---
 
@@ -106,3 +107,18 @@ review_due: null
 - Prepared a bounded proposal for a subordinate constitutional framework, product operating mode and schema-validated warn-only 10-of-10 gate.
 - Kept implementation, commit, push, tag and release as separate approval gates.
 - Patch preparation outside the canonical local repository does not prove local application or full-suite success.
+
+## SESSION-2026-07-26-02
+
+- Applied V1.1 review corrections and verified the complete local gate set: Ruff,
+  mypy, 40 tests, GOVERDOCS validation and health, deterministic rebuild, strict
+  MkDocs and REUSE 3.3.
+- Created and separately approved commit `6236a8cae777063811b41ae00fb36f819f8468e7`, then separately approved
+  and verified a non-force push to `origin/main`.
+- Verified quality run `30191576044` and OpenSSF Scorecard run `30191576042`
+  for the exact commit.
+- Recorded artifact IDs `8628731800`, `8628731425` and
+  `8628727141` with their SHA-256 digests.
+- Accepted ADR-0004 and REV-0003, activated framework, product mode and change
+  gate in warn-only mode, and completed WB-0003.
+- No tag, release or deployment was created.

@@ -6,7 +6,7 @@ status: active
 owner: GOVERDOCS
 created: 2026-07-19
 updated: 2026-07-26
-version: 1.2.0
+version: 1.3.0
 canonical: true
 managed_by: agent
 write_policy: automatic
@@ -32,7 +32,8 @@ source_refs:
   - SESSION-2026-07-24-02
   - SESSION-2026-07-24-03
   - SESSION-2026-07-26-01
-last_verified: null
+  - SESSION-2026-07-26-02
+last_verified: 2026-07-26
 review_due: null
 ---
 
@@ -53,4 +54,4 @@ policies, schemas and Git history. Documentation publication, automatic
 canonical writes, tags and releases remain disabled.
 
 
-A bounded constitutional-framework experiment is proposed for WB-0003. It preserves the exact WORLD bytes and checksum, introduces a subordinate coordination framework, a product/decision/execution operating mode and a schema-validated warn-only 10-of-10 gate. The proposal is not accepted, committed, pushed, tagged or released by patch preparation alone.
+The constitutional framework, product/decision/execution operating mode and schema-validated 10-of-10 gate are active in warn-only mode. The accepted implementation is exact SHA `6236a8cae777063811b41ae00fb36f819f8468e7`; quality run `30191576044` and OpenSSF Scorecard run `30191576042` succeeded and retained checksum-identified artifacts. WORLD remains byte-identical. No tag, release, deployment or autonomous canonical write is implied.

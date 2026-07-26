@@ -2,11 +2,11 @@
 id: ADR-0004
 type: architecture-decision
 title: Establish a Constitutional Framework with Scoped Operating Modes
-status: proposed
+status: accepted
 owner: GOVERDOCS
 created: 2026-07-26
 updated: 2026-07-26
-version: 0.1.1
+version: 1.0.0
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -20,7 +20,8 @@ related:
   - GOV-0001
 source_refs:
   - SESSION-2026-07-26-01
-last_verified: null
+  - SESSION-2026-07-26-02
+last_verified: 2026-07-26
 review_due: 2026-08-15
 ---
 
@@ -37,7 +38,7 @@ change must not modify its bytes or silently change its authority.
 
 ## Decision
 
-Propose a coordinating constitutional framework subordinate to WORLD, a scoped
+Adopt a coordinating constitutional framework subordinate to WORLD, a scoped
 product/decision/execution operating mode and one machine-readable 10-of-10
 change-gate policy. The framework is the single source for approval gates; the
 YAML policy is the single source for the ten change-gate dimensions and refers
@@ -95,5 +96,10 @@ separately approved commit. Do not use force push.
 
 ## Approval
 
-Status remains `proposed`. Implementation, commit, push, tag and release require
-separate approvals.
+Status is `accepted` for the bounded `warn-only` governance scope. The accepted
+implementation is commit `6236a8cae777063811b41ae00fb36f819f8468e7`. Local implementation, commit and push
+were separately approved; quality run `30191576044` and OpenSSF Scorecard run
+`30191576042` succeeded for that exact SHA.
+
+Tag, release, deployment, hard enforcement and autonomous canonical writes are
+not approved by this decision.

@@ -111,7 +111,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print("Canonical write: BLOCKED — approval required" if any(op.approval_required for op in operations) else "Canonical write: eligible after validation")
             return 0
         if args.command == "validate":
-            issues = validate_project(config.root, config.policy_path, config.metadata_schema_path)
+            issues = validate_project(
+                config.root,
+                config.policy_path,
+                config.metadata_schema_path,
+                config.change_gate_path,
+                config.change_gate_schema_path,
+            )
             if args.json:
                 print(json.dumps([issue.to_dict() for issue in issues], ensure_ascii=False, indent=2))
             else:
@@ -135,7 +141,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         if args.command == "health":
             registry = build_registry(config.root, config.policy_path)
-            issues = validate_project(config.root, config.policy_path, config.metadata_schema_path)
+            issues = validate_project(
+                config.root,
+                config.policy_path,
+                config.metadata_schema_path,
+                config.change_gate_path,
+                config.change_gate_schema_path,
+            )
             print(f"PROJECT={config.project_name}\nDOCUMENTS={len(registry['documents'])}\nISSUES={len(issues)}\nSTATUS={'PASS' if not issues else 'FAIL'}")
             if args.receipt:
                 receipt = create_receipt(config.root, "health", "passed" if not issues else "failed", document_count=len(registry["documents"]), issues=[issue.to_dict() for issue in issues])

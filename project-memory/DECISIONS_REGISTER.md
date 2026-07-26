@@ -5,8 +5,8 @@ title: Decisions Register
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-24
-version: 1.0.0
+updated: 2026-07-26
+version: 1.1.0
 canonical: true
 managed_by: mixed
 write_policy: append-only
@@ -16,11 +16,13 @@ related:
   - ADR-0001
   - ADR-0002
   - ADR-0003
+  - ADR-0004
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-23-02
   - SESSION-2026-07-24-02
-last_verified: 2026-07-24
+  - SESSION-2026-07-26-01
+last_verified: null
 review_due: null
 ---
 
@@ -46,3 +48,12 @@ review_due: null
 - Decision: adopt pinned MkDocs Material, a MADR-inspired GOVERDOCS template, REUSE compliance and OpenSSF Scorecard as bounded presentation and evidence tools.
 - Boundary: no new runtime dependencies, no automatic documentation deployment and no canonical-write authority for external tools.
 - Record: `docs/decisions/governance/ADR-0003-open-source-governance-toolchain.md`
+
+
+## ADR-0004 — Establish a Constitutional Framework with Scoped Operating Modes
+
+- Status: proposed
+- Date: 2026-07-26
+- Decision: propose a subordinate coordinating framework, a product operating mode and one schema-validated warn-only 10-of-10 gate while preserving the exact WORLD bytes.
+- Boundary: no autonomous canonical write, no hard enforcement, no commit, push, tag or release implied by patch preparation.
+- Record: `docs/decisions/governance/ADR-0004-constitutional-framework.md`

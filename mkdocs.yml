@@ -24,6 +24,9 @@ nav:
   - Governance model: governance-model.md
   - Kanonická dokumentace:
       - Technická ústava: https://github.com/nulleimy/Goverdocs/blob/main/WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md
+      - Ústavní rámec: https://github.com/nulleimy/Goverdocs/blob/main/GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
+      - Produktový operating mode: https://github.com/nulleimy/Goverdocs/blob/main/PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
+      - Změnová brána 10/10: https://github.com/nulleimy/Goverdocs/blob/main/policies/CHANGE_GATE_10_OF_10.yaml
       - Dokumentační index: https://github.com/nulleimy/Goverdocs/blob/main/DOCUMENTATION_INDEX.md
       - Projektový stav: https://github.com/nulleimy/Goverdocs/blob/main/PROJECT_STATE.md
       - Automatizační governance: https://github.com/nulleimy/Goverdocs/blob/main/docs/governance/GOV-DOCUMENTATION-AUTOMATION.md

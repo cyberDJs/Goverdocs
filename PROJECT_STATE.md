@@ -5,8 +5,8 @@ title: GOVERDOCS Project State
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-24
-version: 1.1.0
+updated: 2026-07-26
+version: 1.2.0
 canonical: true
 managed_by: agent
 write_policy: automatic
@@ -19,6 +19,11 @@ related:
   - ADR-0003
   - WB-0002
   - REV-0002
+  - ADR-0004
+  - WB-0003
+  - REV-0003
+  - CONST-FRAMEWORK-GOVERDOCS
+  - PRODUCT-MODE-GOVERDOCS
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-23-01
@@ -26,7 +31,8 @@ source_refs:
   - SESSION-2026-07-24-01
   - SESSION-2026-07-24-02
   - SESSION-2026-07-24-03
-last_verified: 2026-07-24
+  - SESSION-2026-07-26-01
+last_verified: null
 review_due: null
 ---
 
@@ -51,6 +57,7 @@ review_due: null
 - Open-source toolchain readiness: accepted for commit `3a4c8a58b4a1744b1f59b85b8fe4726fdc3177a1`; exact-SHA `quality` and OpenSSF Scorecard runs succeeded and produced the expected retained artifacts
 - AI writer: not implemented
 - Canonical automatic write: disabled
+- Constitutional framework experiment: proposed and warn-only; canonical WORLD bytes remain unchanged
 
 ## Exit criteria
 

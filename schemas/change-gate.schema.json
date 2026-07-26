@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverdocs.local/schemas/change-gate.schema.json",
+  "title": "GOVERDOCS 10-of-10 change gate",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy_version",
+    "created",
+    "updated",
+    "review_due",
+    "id",
+    "status",
+    "enforcement",
+    "owner",
+    "normative_parent",
+    "allowed_results",
+    "approval_gate_reference",
+    "score_rules",
+    "reporting_requires",
+    "dimensions",
+    "success_label",
+    "partial_label",
+    "blocked_label",
+    "not_applicable_requires"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?$"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_due": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "id": {
+      "const": "GATE-10-OF-10"
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "active",
+        "deprecated"
+      ]
+    },
+    "enforcement": {
+      "enum": [
+        "warn-only",
+        "blocking"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normative_parent": {
+      "const": "CONST-FRAMEWORK-GOVERDOCS"
+    },
+    "allowed_results": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "verified",
+          "not-verified",
+          "blocked",
+          "not-applicable"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "approval_gate_reference": {
+      "const": "GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md#approval-gates"
+    },
+    "score_rules": {
+      "type": "object",
+      "required": [
+        "verified",
+        "not-verified",
+        "not-applicable",
+        "blocked",
+        "full_score",
+        "full_score_requires_no_blocked",
+        "full_score_requires_evidence_for_every_dimension",
+        "full_score_report_requires_counts"
+      ],
+      "properties": {
+        "verified": {
+          "const": 1
+        },
+        "not-verified": {
+          "const": 0
+        },
+        "not-applicable": {
+          "const": 1
+        },
+        "blocked": {
+          "type": "null"
+        },
+        "full_score": {
+          "const": 10
+        },
+        "full_score_requires_no_blocked": {
+          "const": true
+        },
+        "full_score_requires_evidence_for_every_dimension": {
+          "const": true
+        },
+        "full_score_report_requires_counts": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting_requires": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "verified_count"
+        },
+        {
+          "const": "not_applicable_count"
+        },
+        {
+          "const": "blocked_count"
+        },
+        {
+          "const": "declared_scope"
+        },
+        {
+          "const": "environment"
+        },
+        {
+          "const": "evidence_refs"
+        }
+      ],
+      "items": false,
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "question",
+          "required",
+          "blocking",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]+$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 3
+          },
+          "question": {
+            "type": "string",
+            "minLength": 10
+          },
+          "required": {
+            "const": true
+          },
+          "blocking": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "success_label": {
+      "const": "VERIFIED FOR DECLARED SCOPE"
+    },
+    "partial_label": {
+      "const": "PARTIALLY VERIFIED"
+    },
+    "blocked_label": {
+      "const": "BLOCKED"
+    },
+    "not_applicable_requires": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "owner"
+        },
+        {
+          "const": "rationale"
+        },
+        {
+          "const": "evidence"
+        }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    }
+  },
+  "additionalProperties": false
+}

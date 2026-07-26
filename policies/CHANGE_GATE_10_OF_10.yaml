@@ -1,0 +1,122 @@
+schema_version: 1
+policy_version: 0.1.1
+created: "2026-07-26"
+updated: "2026-07-26"
+review_due: "2026-08-15"
+id: GATE-10-OF-10
+status: proposed
+enforcement: warn-only
+owner: GOVERDOCS
+normative_parent: CONST-FRAMEWORK-GOVERDOCS
+success_label: VERIFIED FOR DECLARED SCOPE
+partial_label: PARTIALLY VERIFIED
+blocked_label: BLOCKED
+allowed_results:
+  - verified
+  - not-verified
+  - blocked
+  - not-applicable
+not_applicable_requires:
+  - owner
+  - rationale
+  - evidence
+approval_gate_reference: GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md#approval-gates
+score_rules:
+  verified: 1
+  not-verified: 0
+  not-applicable: 1
+  blocked: null
+  full_score: 10
+  full_score_requires_no_blocked: true
+  full_score_requires_evidence_for_every_dimension: true
+  full_score_report_requires_counts: true
+reporting_requires:
+  - verified_count
+  - not_applicable_count
+  - blocked_count
+  - declared_scope
+  - environment
+  - evidence_refs
+dimensions:
+  - id: simplicity
+    title: Jednoduchost
+    question: Je řešení nejmenší srozumitelný vertikální řez bez zbytečné abstrakce?
+    required: true
+    blocking: false
+    evidence:
+      - bounded-diff
+      - alternatives-considered
+  - id: purpose
+    title: Účelnost
+    question: Řeší změna ověřený problém a definovaný outcome?
+    required: true
+    blocking: true
+    evidence:
+      - verified-problem
+      - outcome
+      - non-goals
+  - id: automation
+    title: Bezpečná automatizace
+    question: Jsou opakovatelné kontroly automatizované bez převzetí rozhodovací autority?
+    required: true
+    blocking: false
+    evidence:
+      - automated-checks
+      - authority-boundary
+  - id: zero-trust
+    title: Nulová důvěra
+    question: Jsou ověřeny identity, oprávnění, integrita, původ a trust boundaries?
+    required: true
+    blocking: true
+    evidence:
+      - trust-boundaries
+      - least-privilege
+      - integrity-check
+  - id: measurability
+    title: Měřitelnost
+    question: Existují baseline, target, zdroj dat a pravidlo vyhodnocení?
+    required: true
+    blocking: false
+    evidence:
+      - baseline
+      - success-metric
+  - id: reversibility
+    title: Vratnost
+    question: Existuje bezpečný a ověřitelný rollback nebo migrační cesta?
+    required: true
+    blocking: true
+    evidence:
+      - rollback-plan
+      - rollback-verification
+  - id: evidence
+    title: Důkazní ověřitelnost
+    question: Lze každé významné tvrzení doložit konkrétním reprodukovatelným důkazem?
+    required: true
+    blocking: true
+    evidence:
+      - source-reference
+      - verification-output
+  - id: reliability
+    title: Spolehlivost
+    question: Jsou známé failure modes, health signály, ownership a provozní hranice?
+    required: true
+    blocking: false
+    evidence:
+      - failure-mode-analysis
+      - health-or-non-runtime-rationale
+  - id: lifecycle-audit
+    title: Audit celého lifecycle
+    question: Je změna dohledatelná za hranici Git historie podle deklarovaného rozsahu?
+    required: true
+    blocking: true
+    evidence:
+      - lifecycle-chain
+      - artifact-or-non-artifact-rationale
+  - id: ownership
+    title: Ownership a schválení
+    question: Jsou určeni vlastníci a odděleny relevantní approval gates?
+    required: true
+    blocking: true
+    evidence:
+      - accountable-owner
+      - approval-records

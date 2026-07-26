@@ -6,6 +6,8 @@ preserve_history: true
 allow_silent_overwrite: false
 canonical_root: .
 metadata_required:
+- PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
+- GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
 - PROJECT_STATE.md
 - DOCUMENTATION_INDEX.md
 - project-memory/*.md
@@ -28,6 +30,8 @@ append_only:
 - project-memory/SESSION_LOG.md
 - project-memory/DECISIONS_REGISTER.md
 approval_required:
+- PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
+- GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
 - docs/decisions/**
 - docs/architecture/**
 - docs/security/**

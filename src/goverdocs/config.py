@@ -13,6 +13,8 @@ class GoverdocsConfig:
     policy_path: Path
     matrix_path: Path
     metadata_schema_path: Path
+    change_gate_path: Path | None
+    change_gate_schema_path: Path | None
 
 
 def find_root(start: Path | None = None) -> Path:
@@ -21,6 +23,12 @@ def find_root(start: Path | None = None) -> Path:
         if (candidate / ".goverdocs.yaml").is_file():
             return candidate
     return current
+
+
+def _optional_path(root: Path, value: object) -> Path | None:
+    if value is None:
+        return None
+    return root / str(value)
 
 
 def load_config(root: Path | None = None) -> GoverdocsConfig:
@@ -35,4 +43,6 @@ def load_config(root: Path | None = None) -> GoverdocsConfig:
         policy_path=resolved / str(raw.get("policy_path", "automation/documentation_policy.yaml")),
         matrix_path=resolved / str(raw.get("matrix_path", "automation/documentation_decision_matrix.yaml")),
         metadata_schema_path=resolved / str(raw.get("metadata_schema_path", "schemas/document-metadata.schema.json")),
+        change_gate_path=_optional_path(resolved, raw.get("change_gate_path")),
+        change_gate_schema_path=_optional_path(resolved, raw.get("change_gate_schema_path")),
     )

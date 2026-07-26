@@ -3,3 +3,5 @@ project_name: GOVERDOCS
 policy_path: automation/documentation_policy.yaml
 matrix_path: automation/documentation_decision_matrix.yaml
 metadata_schema_path: schemas/document-metadata.schema.json
+change_gate_path: policies/CHANGE_GATE_10_OF_10.yaml
+change_gate_schema_path: schemas/change-gate.schema.json

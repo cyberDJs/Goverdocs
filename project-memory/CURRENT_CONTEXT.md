@@ -5,8 +5,8 @@ title: Current Context
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-24
-version: 1.1.0
+updated: 2026-07-26
+version: 1.2.0
 canonical: true
 managed_by: agent
 write_policy: automatic
@@ -19,6 +19,11 @@ related:
   - ADR-0003
   - WB-0002
   - REV-0002
+  - ADR-0004
+  - WB-0003
+  - REV-0003
+  - CONST-FRAMEWORK-GOVERDOCS
+  - PRODUCT-MODE-GOVERDOCS
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-23-01
@@ -26,7 +31,8 @@ source_refs:
   - SESSION-2026-07-24-01
   - SESSION-2026-07-24-02
   - SESSION-2026-07-24-03
-last_verified: 2026-07-24
+  - SESSION-2026-07-26-01
+last_verified: null
 review_due: null
 ---
 
@@ -45,3 +51,6 @@ template, REUSE compliance and OpenSSF Scorecard remain presentation, authoring
 or evidence producers; canonical authority remains in GOVERDOCS documents,
 policies, schemas and Git history. Documentation publication, automatic
 canonical writes, tags and releases remain disabled.
+
+
+A bounded constitutional-framework experiment is proposed for WB-0003. It preserves the exact WORLD bytes and checksum, introduces a subordinate coordination framework, a product/decision/execution operating mode and a schema-validated warn-only 10-of-10 gate. The proposal is not accepted, committed, pushed, tagged or released by patch preparation alone.

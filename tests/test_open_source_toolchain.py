@@ -110,19 +110,44 @@ def test_governance_records_and_generated_artifacts_are_current() -> None:
     assert documents["ADR-0003"]["status"] == "accepted"
     assert documents["REV-0002"]["status"] == "accepted"
     assert documents["WB-0002"]["status"] == "completed"
+    assert documents["ADR-0004"]["status"] == "proposed"
+    assert documents["WB-0003"]["status"] == "active"
+    assert documents["REV-0003"]["status"] == "in-review"
+    assert documents["CONST-FRAMEWORK-GOVERDOCS"]["status"] == "proposed"
+    assert documents["PRODUCT-MODE-GOVERDOCS"]["status"] == "proposed"
     assert documents["WB-0002"]["path"] == (
         "docs/work-blocks/completed/"
         "WB-0002-open-source-governance-toolchain.md"
     )
     assert status == {
-        "generated_at": "2026-07-24T00:00:00+00:00",
-        "document_count": 19,
-        "status_counts": {"accepted": 5, "active": 13, "completed": 1},
+        "generated_at": "2026-07-26T00:00:00+00:00",
+        "document_count": 24,
+        "status_counts": {
+            "accepted": 5,
+            "active": 14,
+            "completed": 1,
+            "in-review": 1,
+            "proposed": 3,
+        },
     }
     node_ids = {node["id"] for node in graph["nodes"]}
-    assert {"ADR-0003", "WB-0002", "REV-0002"} <= node_ids
+    assert {
+        "ADR-0003",
+        "WB-0002",
+        "REV-0002",
+        "ADR-0004",
+        "WB-0003",
+        "REV-0003",
+        "CONST-FRAMEWORK-GOVERDOCS",
+        "PRODUCT-MODE-GOVERDOCS",
+    } <= node_ids
     assert "`ADR-0003`" in index
     assert "`REV-0002`" in index
+    assert "`ADR-0004`" in index
+    assert "`WB-0003`" in index
+    assert "`REV-0003`" in index
+    assert "`CONST-FRAMEWORK-GOVERDOCS`" in index
+    assert "`PRODUCT-MODE-GOVERDOCS`" in index
     assert (
         "[docs/work-blocks/completed/"
         "WB-0002-open-source-governance-toolchain.md]"

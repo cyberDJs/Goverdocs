@@ -5,8 +5,8 @@ title: Session Log
 status: active
 owner: GOVERDOCS
 created: 2026-07-19
-updated: 2026-07-24
-version: 1.1.0
+updated: 2026-07-26
+version: 1.2.0
 canonical: true
 managed_by: mixed
 write_policy: append-only
@@ -15,6 +15,9 @@ superseded_by: null
 related:
   - WB-0001
   - WB-0002
+  - WB-0003
+  - ADR-0004
+  - REV-0003
 source_refs:
   - SESSION-2026-07-19-01
   - SESSION-2026-07-19-02
@@ -23,7 +26,8 @@ source_refs:
   - SESSION-2026-07-24-01
   - SESSION-2026-07-24-02
   - SESSION-2026-07-24-03
-last_verified: 2026-07-24
+  - SESSION-2026-07-26-01
+last_verified: null
 review_due: null
 ---
 
@@ -93,3 +97,12 @@ review_due: null
 - Verified OpenSSF Scorecard run `30082659625`, Code Scanning SARIF upload and all expected retained artifacts.
 - Accepted REV-0002 and completed WB-0002.
 - No tag or GitHub release was created.
+
+
+## SESSION-2026-07-26-01
+
+- Verified the unchanged WORLD constitution against SHA-256 `ed44c6147049887d941b7497f1bce3b817f22b6ae00a5136a27365a2f688d918` before preparing the experiment.
+- Verified the remote base remained `e84e982c59e4c2001bc4b720456046f2447d4f70`.
+- Prepared a bounded proposal for a subordinate constitutional framework, product operating mode and schema-validated warn-only 10-of-10 gate.
+- Kept implementation, commit, push, tag and release as separate approval gates.
+- Patch preparation outside the canonical local repository does not prove local application or full-suite success.

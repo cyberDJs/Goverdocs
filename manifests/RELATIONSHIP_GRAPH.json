@@ -6,6 +6,16 @@
       "type": "documentation-index"
     },
     {
+      "id": "CONST-FRAMEWORK-GOVERDOCS",
+      "path": "GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md",
+      "type": "governance-constitution-framework"
+    },
+    {
+      "id": "PRODUCT-MODE-GOVERDOCS",
+      "path": "PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md",
+      "type": "product-decision-execution-operating-mode"
+    },
+    {
       "id": "PROJECT-STATE-GOVERDOCS",
       "path": "PROJECT_STATE.md",
       "type": "project-state"
@@ -28,6 +38,11 @@
     {
       "id": "ADR-0003",
       "path": "docs/decisions/governance/ADR-0003-open-source-governance-toolchain.md",
+      "type": "architecture-decision"
+    },
+    {
+      "id": "ADR-0004",
+      "path": "docs/decisions/governance/ADR-0004-constitutional-framework.md",
       "type": "architecture-decision"
     },
     {
@@ -56,6 +71,11 @@
       "type": "review"
     },
     {
+      "id": "REV-0003",
+      "path": "docs/reviews/REV-0003-constitutional-framework-readiness.md",
+      "type": "review"
+    },
+    {
       "id": "SEC-0001",
       "path": "docs/security/SEC-0001-trust-boundaries.md",
       "type": "security"
@@ -63,6 +83,11 @@
     {
       "id": "WB-0001",
       "path": "docs/work-blocks/active/WB-0001-foundation.md",
+      "type": "work-block"
+    },
+    {
+      "id": "WB-0003",
+      "path": "docs/work-blocks/active/WB-0003-constitutional-framework.md",
       "type": "work-block"
     },
     {
@@ -103,6 +128,56 @@
       "type": "related"
     },
     {
+      "from": "CONST-FRAMEWORK-GOVERDOCS",
+      "to": "PRODUCT-MODE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "CONST-FRAMEWORK-GOVERDOCS",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "CONST-FRAMEWORK-GOVERDOCS",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
+      "from": "CONST-FRAMEWORK-GOVERDOCS",
+      "to": "REV-0003",
+      "type": "related"
+    },
+    {
+      "from": "CONST-FRAMEWORK-GOVERDOCS",
+      "to": "GOV-0001",
+      "type": "related"
+    },
+    {
+      "from": "PRODUCT-MODE-GOVERDOCS",
+      "to": "CONST-FRAMEWORK-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "PRODUCT-MODE-GOVERDOCS",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "PRODUCT-MODE-GOVERDOCS",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
+      "from": "PRODUCT-MODE-GOVERDOCS",
+      "to": "REV-0003",
+      "type": "related"
+    },
+    {
+      "from": "PRODUCT-MODE-GOVERDOCS",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
       "from": "PROJECT-STATE-GOVERDOCS",
       "to": "EPIC-0001",
       "type": "related"
@@ -130,6 +205,31 @@
     {
       "from": "PROJECT-STATE-GOVERDOCS",
       "to": "REV-0002",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "REV-0003",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "CONST-FRAMEWORK-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "PROJECT-STATE-GOVERDOCS",
+      "to": "PRODUCT-MODE-GOVERDOCS",
       "type": "related"
     },
     {
@@ -195,6 +295,31 @@
     {
       "from": "ADR-0003",
       "to": "REV-0002",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0004",
+      "to": "CONST-FRAMEWORK-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0004",
+      "to": "PRODUCT-MODE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0004",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0004",
+      "to": "REV-0003",
+      "type": "related"
+    },
+    {
+      "from": "ADR-0004",
+      "to": "GOV-0001",
       "type": "related"
     },
     {
@@ -288,6 +413,26 @@
       "type": "related"
     },
     {
+      "from": "REV-0003",
+      "to": "CONST-FRAMEWORK-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "REV-0003",
+      "to": "PRODUCT-MODE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "REV-0003",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "REV-0003",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
       "from": "SEC-0001",
       "to": "ADR-0001",
       "type": "related"
@@ -309,6 +454,31 @@
     },
     {
       "from": "WB-0001",
+      "to": "PROJECT-STATE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "WB-0003",
+      "to": "CONST-FRAMEWORK-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "WB-0003",
+      "to": "PRODUCT-MODE-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "WB-0003",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "WB-0003",
+      "to": "REV-0003",
+      "type": "related"
+    },
+    {
+      "from": "WB-0003",
       "to": "PROJECT-STATE-GOVERDOCS",
       "type": "related"
     },
@@ -338,6 +508,11 @@
       "type": "related"
     },
     {
+      "from": "ACTIVE-GOVERDOCS",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
       "from": "CTX-GOVERDOCS",
       "to": "PROJECT-STATE-GOVERDOCS",
       "type": "related"
@@ -368,6 +543,31 @@
       "type": "related"
     },
     {
+      "from": "CTX-GOVERDOCS",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "REV-0003",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "CONST-FRAMEWORK-GOVERDOCS",
+      "type": "related"
+    },
+    {
+      "from": "CTX-GOVERDOCS",
+      "to": "PRODUCT-MODE-GOVERDOCS",
+      "type": "related"
+    },
+    {
       "from": "DEC-REG-GOVERDOCS",
       "to": "ADR-0001",
       "type": "related"
@@ -380,6 +580,11 @@
     {
       "from": "DEC-REG-GOVERDOCS",
       "to": "ADR-0003",
+      "type": "related"
+    },
+    {
+      "from": "DEC-REG-GOVERDOCS",
+      "to": "ADR-0004",
       "type": "related"
     },
     {
@@ -400,6 +605,21 @@
     {
       "from": "SESSION-GOVERDOCS",
       "to": "WB-0002",
+      "type": "related"
+    },
+    {
+      "from": "SESSION-GOVERDOCS",
+      "to": "WB-0003",
+      "type": "related"
+    },
+    {
+      "from": "SESSION-GOVERDOCS",
+      "to": "ADR-0004",
+      "type": "related"
+    },
+    {
+      "from": "SESSION-GOVERDOCS",
+      "to": "REV-0003",
       "type": "related"
     }
   ]

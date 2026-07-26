@@ -8,6 +8,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 
+from .constitutional import validate_constitutional_framework
 from .frontmatter import ParsedDocument, parse_frontmatter
 from .models import ValidationIssue
 from .registry import governed_documents
@@ -19,7 +20,13 @@ def _issue(severity: str, code: str, path: Path, root: Path, message: str) -> Va
     return ValidationIssue(severity, code, path.relative_to(root).as_posix(), message)
 
 
-def validate_project(root: Path, policy_path: Path, schema_path: Path) -> list[ValidationIssue]:
+def validate_project(
+    root: Path,
+    policy_path: Path,
+    schema_path: Path,
+    change_gate_path: Path | None = None,
+    change_gate_schema_path: Path | None = None,
+) -> list[ValidationIssue]:
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     schema_validator = Draft202012Validator(schema, format_checker=FormatChecker())
     issues: list[ValidationIssue] = []
@@ -78,4 +85,5 @@ def validate_project(root: Path, policy_path: Path, schema_path: Path) -> list[V
                 continue
             if not target_path.exists():
                 issues.append(_issue("error", "BROKEN_LINK", doc.path, root, f"missing local target: {raw_link}"))
+    issues.extend(validate_constitutional_framework(root, change_gate_path, change_gate_schema_path))
     return sorted(issues, key=lambda item: (item.severity, item.path, item.code))

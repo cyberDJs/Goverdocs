@@ -98,9 +98,9 @@ def subject_matches(
     )
     for key, expected in comparisons:
         actual = subject.get(key)
+        if actual is None and require_scm_context:
+            return False, f"subject.{key} is required"
         if actual is None:
-            if require_scm_context:
-                return False, f"subject.{key} is required"
             continue
         if expected is None:
             return False, f"subject.{key} is bound but evaluation context does not provide it"

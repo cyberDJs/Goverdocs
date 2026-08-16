@@ -189,7 +189,8 @@ def _assess_approval(
     as_of: date,
     trusted_verifiers: set[str],
 ) -> dict[str, Any]:
-    actor = record.get("actor") if isinstance(record.get("actor"), dict) else {}
+    raw_actor = record.get("actor")
+    actor: dict[str, Any] = raw_actor if isinstance(raw_actor, dict) else {}
     result: dict[str, Any] = {
         "id": str(record.get("approval_id") or "UNKNOWN"),
         "record_digest": record_digest(record),

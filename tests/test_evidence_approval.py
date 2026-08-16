@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from goverdocs import gate
+import goverdocs.gate as gate
 from goverdocs.evidence import change_digest, validate_record
 from goverdocs.models import Event, Operation
 

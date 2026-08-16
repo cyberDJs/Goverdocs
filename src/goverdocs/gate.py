@@ -10,6 +10,7 @@ from .classifier import classify
 from .frontmatter import parse_frontmatter
 from .planner import load_matrix, plan
 from .registry import governed_documents
+from .utils import path_matches
 from .validator import validate_project
 
 
@@ -83,6 +84,51 @@ def _freshness_gaps(root: Path, policy_path: Path, as_of: date) -> list[dict[str
     return gaps
 
 
+def _matrix_detection_gaps(
+    changed_files: list[str],
+    diff_text: str,
+    matrix: dict[str, Any],
+    emitted_events: set[str],
+) -> list[dict[str, Any]]:
+    gaps: list[dict[str, Any]] = []
+    lowered = diff_text.lower()
+    for rule in matrix.get("rules", []):
+        if not isinstance(rule, dict):
+            continue
+        event = str(rule.get("event") or "")
+        rule_id = str(rule.get("id") or event or "UNKNOWN")
+        if not event or event in emitted_events:
+            continue
+        detection = rule.get("detection") or {}
+        if not isinstance(detection, dict):
+            continue
+        reasons: list[str] = []
+        for clause in detection.get("any", []) or []:
+            if not isinstance(clause, dict):
+                continue
+            patterns = [str(item) for item in clause.get("changed_paths", []) or []]
+            if patterns:
+                matches = sorted(path for path in changed_files if path_matches(path, patterns))
+                reasons.extend(f"matched matrix path: {path}" for path in matches[:5])
+            signals = [str(item).lower() for item in clause.get("semantic_signals", []) or []]
+            if signals:
+                hits = sorted(signal for signal in signals if signal and signal in lowered)
+                reasons.extend(f"matched matrix semantic signal: {signal}" for signal in hits[:5])
+        if not reasons:
+            continue
+        detail = "; ".join(sorted(set(reasons)))
+        gaps.append(
+            {
+                "code": "CLASSIFIER_MATRIX_DRIFT",
+                "severity": "warning",
+                "blocking": False,
+                "subject": rule_id,
+                "message": f"matrix detection matched event {event}, but classifier did not emit it: {detail}",
+            }
+        )
+    return gaps
+
+
 def evaluate_gate(
     *,
     root: Path,
@@ -102,6 +148,8 @@ def evaluate_gate(
 
     obligations: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
+    emitted_events = {event.name for event in events}
+    gaps.extend(_matrix_detection_gaps(changed_files, diff_text, matrix, emitted_events))
 
     for event in events:
         rule = by_event.get(event.name)

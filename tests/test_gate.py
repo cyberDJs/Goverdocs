@@ -66,8 +66,8 @@ def test_gate_blocks_when_explicit_approval_is_required(monkeypatch, tmp_path: P
 
     assert report["status"] == "BLOCKED"
     assert report["obligations"][0]["approval_required"] is True
-    assert any(item["code"] == "APPROVAL_REQUIRED" and item["blocking"] for item in report["evidence_gaps"])
-    assert any(item["code"] == "EVIDENCE_UNVERIFIED" and not item["blocking"] for item in report["evidence_gaps"])
+    assert any(item["code"] == "APPROVAL_CONTEXT_INCOMPLETE" and item["blocking"] for item in report["evidence_gaps"])
+    assert any(item["code"] == "EVIDENCE_MISSING" and not item["blocking"] for item in report["evidence_gaps"])
 
 
 def test_gate_warns_when_matrix_detection_outpaces_classifier(monkeypatch, tmp_path: Path) -> None:

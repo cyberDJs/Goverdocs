@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .classifier import classify
+from .evidence import change_digest, record_digest, subject_matches, validate_record, verification_is_fresh, verification_is_trusted
 from .frontmatter import parse_frontmatter
 from .planner import load_matrix, plan
 from .registry import governed_documents
@@ -129,6 +130,113 @@ def _matrix_detection_gaps(
     return gaps
 
 
+def _assess_evidence(
+    record: dict[str, Any],
+    *,
+    expected_change_digest: str,
+    repository: str | None,
+    pull_request: int | None,
+    head_sha: str | None,
+    as_of: date,
+    trusted_verifiers: set[str],
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "id": str(record.get("evidence_id") or "UNKNOWN"),
+        "record_digest": record_digest(record),
+        "rule_id": str(record.get("rule_id") or ""),
+        "requirement": str(record.get("requirement") or ""),
+        "status": "INVALID",
+        "reasons": [],
+    }
+    errors = validate_record(record, "evidence-item.schema.json")
+    if errors:
+        result["reasons"] = errors
+        return result
+    subject_ok, subject_reason = subject_matches(
+        record,
+        expected_change_digest=expected_change_digest,
+        repository=repository,
+        pull_request=pull_request,
+        head_sha=head_sha,
+        require_scm_context=False,
+    )
+    if not subject_ok:
+        result["status"] = "SUBJECT_MISMATCH"
+        result["reasons"] = [subject_reason]
+        return result
+    fresh, fresh_reason = verification_is_fresh(record, as_of)
+    if not fresh:
+        result["status"] = "STALE"
+        result["reasons"] = [fresh_reason]
+        return result
+    trusted, trusted_reason = verification_is_trusted(record, trusted_verifiers)
+    if not trusted:
+        result["status"] = "UNTRUSTED"
+        result["reasons"] = [trusted_reason]
+        return result
+    result["status"] = "VERIFIED"
+    result["reasons"] = [subject_reason, fresh_reason, trusted_reason]
+    return result
+
+
+def _assess_approval(
+    record: dict[str, Any],
+    *,
+    expected_change_digest: str,
+    repository: str | None,
+    pull_request: int | None,
+    head_sha: str | None,
+    as_of: date,
+    trusted_verifiers: set[str],
+) -> dict[str, Any]:
+    raw_actor = record.get("actor")
+    actor: dict[str, Any] = raw_actor if isinstance(raw_actor, dict) else {}
+    result: dict[str, Any] = {
+        "id": str(record.get("approval_id") or "UNKNOWN"),
+        "record_digest": record_digest(record),
+        "rule_id": str(record.get("rule_id") or ""),
+        "approval_type": str(record.get("approval_type") or ""),
+        "decision": str(record.get("decision") or ""),
+        "actor_id": str(actor.get("id") or ""),
+        "actor_role": str(actor.get("role") or ""),
+        "status": "INVALID",
+        "reasons": [],
+    }
+    errors = validate_record(record, "approval.schema.json")
+    if errors:
+        result["reasons"] = errors
+        return result
+    subject_ok, subject_reason = subject_matches(
+        record,
+        expected_change_digest=expected_change_digest,
+        repository=repository,
+        pull_request=pull_request,
+        head_sha=head_sha,
+        require_scm_context=True,
+    )
+    if not subject_ok:
+        result["status"] = "SUBJECT_MISMATCH"
+        result["reasons"] = [subject_reason]
+        return result
+    fresh, fresh_reason = verification_is_fresh(record, as_of)
+    if not fresh:
+        result["status"] = "STALE"
+        result["reasons"] = [fresh_reason]
+        return result
+    trusted, trusted_reason = verification_is_trusted(record, trusted_verifiers)
+    if not trusted:
+        result["status"] = "UNTRUSTED"
+        result["reasons"] = [trusted_reason]
+        return result
+    if record["decision"] != "approved":
+        result["status"] = str(record["decision"]).upper()
+        result["reasons"] = [subject_reason, fresh_reason, trusted_reason, f"approval decision is {record['decision']}"]
+        return result
+    result["status"] = "VERIFIED"
+    result["reasons"] = [subject_reason, fresh_reason, trusted_reason]
+    return result
+
+
 def evaluate_gate(
     *,
     root: Path,
@@ -140,11 +248,47 @@ def evaluate_gate(
     changed_files: list[str],
     diff_text: str,
     as_of: date,
+    repository: str | None = None,
+    pull_request: int | None = None,
+    head_sha: str | None = None,
+    evidence_items: list[dict[str, Any]] | None = None,
+    approvals: list[dict[str, Any]] | None = None,
+    trusted_verifiers: set[str] | None = None,
 ) -> dict[str, Any]:
+    evidence_items = evidence_items or []
+    approvals = approvals or []
+    trusted_verifiers = trusted_verifiers or set()
+    current_change_digest = change_digest(changed_files, diff_text)
+
     events = classify(changed_files, diff_text)
     operations = plan(events, matrix_path)
     matrix = load_matrix(matrix_path)
     by_event = {str(rule["event"]): rule for rule in matrix["rules"]}
+
+    evidence_results = [
+        _assess_evidence(
+            record,
+            expected_change_digest=current_change_digest,
+            repository=repository,
+            pull_request=pull_request,
+            head_sha=head_sha,
+            as_of=as_of,
+            trusted_verifiers=trusted_verifiers,
+        )
+        for record in evidence_items
+    ]
+    approval_results = [
+        _assess_approval(
+            record,
+            expected_change_digest=current_change_digest,
+            repository=repository,
+            pull_request=pull_request,
+            head_sha=head_sha,
+            as_of=as_of,
+            trusted_verifiers=trusted_verifiers,
+        )
+        for record in approvals
+    ]
 
     obligations: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
@@ -173,25 +317,55 @@ def evaluate_gate(
                 "actions": rule_operations,
             }
         )
+
         for requirement in required_evidence:
+            candidates = [item for item in evidence_results if item["rule_id"] == rule_id and item["requirement"] == requirement]
+            if any(item["status"] == "VERIFIED" for item in candidates):
+                continue
+            if not candidates:
+                message = f"required evidence is missing: {requirement}"
+                code = "EVIDENCE_MISSING"
+            else:
+                states = ", ".join(sorted({str(item["status"]) for item in candidates}))
+                message = f"required evidence is present but not verified for this exact change: {requirement} ({states})"
+                code = "EVIDENCE_UNVERIFIED"
             gaps.append(
                 {
-                    "code": "EVIDENCE_UNVERIFIED",
+                    "code": code,
                     "severity": "warning",
                     "blocking": False,
                     "subject": rule_id,
-                    "message": f"required evidence not verified by Gate R1: {requirement}",
+                    "message": message,
                 }
             )
+
         if approval_required:
-            roles = ", ".join(approval_roles) if approval_roles else "unspecified role"
+            candidates = [item for item in approval_results if item["rule_id"] == rule_id]
+            verified = [
+                item
+                for item in candidates
+                if item["status"] == "VERIFIED" and (not approval_roles or item["actor_role"] in approval_roles)
+            ]
+            if verified:
+                continue
+            if repository is None or pull_request is None or head_sha is None:
+                code = "APPROVAL_CONTEXT_INCOMPLETE"
+                message = "approval requires repository, pull_request and head_sha evaluation context"
+            elif not candidates:
+                roles = ", ".join(approval_roles) if approval_roles else "unspecified role"
+                code = "APPROVAL_REQUIRED"
+                message = f"explicit approval is required from {roles}; no bound approval record was provided"
+            else:
+                states = ", ".join(sorted({str(item["status"]) for item in candidates}))
+                code = "APPROVAL_UNVERIFIED"
+                message = f"approval records exist but none is verified, fresh, trusted, role-authorized and bound to this exact change ({states})"
             gaps.append(
                 {
-                    "code": "APPROVAL_REQUIRED",
+                    "code": code,
                     "severity": "error",
                     "blocking": True,
                     "subject": rule_id,
-                    "message": f"explicit approval is required from {roles}; Gate R1 does not infer approval",
+                    "message": message,
                 }
             )
 
@@ -226,25 +400,32 @@ def evaluate_gate(
         ),
     )
     obligations = sorted(obligations, key=lambda item: (-int(item["priority"]), str(item["rule_id"])))
+    evidence_results = sorted(evidence_results, key=lambda item: (str(item["rule_id"]), str(item["requirement"]), str(item["id"])))
+    approval_results = sorted(approval_results, key=lambda item: (str(item["rule_id"]), str(item["actor_role"]), str(item["id"])))
 
     if any(bool(item["blocking"]) for item in gaps):
         status = "BLOCKED"
         rationale = ["one or more blocking governance conditions are unresolved"]
-    elif gaps or obligations:
+    elif gaps:
         status = "WARN"
-        rationale = ["non-blocking obligations or evidence/freshness gaps require review"]
+        rationale = ["non-blocking evidence, freshness or drift gaps require review"]
     else:
         status = "PASS"
-        rationale = ["no blocking or warning governance conditions were detected"]
+        rationale = ["all detected obligations are satisfied for the declared evaluation scope"]
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": status,
         "evaluation_date": as_of.isoformat(),
         "input": {
             "digest": _input_digest(changed_files, diff_text, as_of),
+            "change_digest": current_change_digest,
             "changed_files": sorted(changed_files),
+            "repository": repository,
+            "pull_request": pull_request,
+            "head_sha": head_sha,
         },
+        "trust": {"trusted_verifiers": sorted(trusted_verifiers)},
         "policy_digests": _policy_digests(
             root,
             policy_path,
@@ -255,6 +436,8 @@ def evaluate_gate(
         ),
         "events": [event.to_dict() for event in events],
         "obligations": obligations,
+        "evidence_inputs": evidence_results,
+        "approval_inputs": approval_results,
         "validation_issues": [issue.to_dict() for issue in validation_issues],
         "evidence_gaps": gaps,
         "rationale": rationale,

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverdocs.local/schemas/evidence-item.schema.json",
+  "title": "GOVERDOCS EvidenceItem v1",
+  "type": "object",
+  "required": ["schema_version", "evidence_id", "rule_id", "requirement", "subject", "source", "producer", "verification"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "evidence_id": {"type": "string", "minLength": 1},
+    "rule_id": {"type": "string", "minLength": 1},
+    "requirement": {"type": "string", "minLength": 1},
+    "subject": {
+      "type": "object",
+      "required": ["change_digest"],
+      "properties": {
+        "change_digest": {"$ref": "#/$defs/sha256"},
+        "repository": {"type": "string", "minLength": 3},
+        "pull_request": {"type": "integer", "minimum": 1},
+        "head_sha": {"$ref": "#/$defs/gitSha"}
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": ["ref"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "producer": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"enum": ["human", "tool", "system", "external-service"]}
+      },
+      "additionalProperties": false
+    },
+    "verification": {"$ref": "#/$defs/verification"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "verification": {
+      "type": "object",
+      "required": ["status", "verifier_id", "method", "verified_at", "valid_until"],
+      "properties": {
+        "status": {"enum": ["verified", "unverified", "rejected"]},
+        "verifier_id": {"type": "string", "minLength": 1},
+        "method": {"type": "string", "minLength": 1},
+        "verified_at": {"type": "string", "format": "date-time"},
+        "valid_until": {"type": ["string", "null"], "format": "date"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -6,8 +6,8 @@
 
 **Rozpoznej dopad změny. Naplánuj řízenou aktualizaci. Ověř pravidla. Zachovej auditní stopu.**
 
-[![Quality](https://github.com/nulleimy/Goverdocs/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/nulleimy/Goverdocs/actions/workflows/quality.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/nulleimy/Goverdocs/badge)](https://scorecard.dev/viewer/?uri=github.com/nulleimy/Goverdocs)
+[![Quality](https://github.com/cyberDJs/Goverdocs/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/cyberDJs/Goverdocs/actions/workflows/quality.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cyberDJs/Goverdocs/badge)](https://scorecard.dev/viewer/?uri=github.com/cyberDJs/Goverdocs)
 ![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB?logo=python&logoColor=white)
 [![License](https://img.shields.io/badge/License-Apache--2.0-2ea44f)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-release%20candidate-f0ad4e)](PROJECT_STATE.md)
@@ -114,7 +114,7 @@ canonical obsah.
 ### Instalace z repozitáře
 
 ```bash
-git clone https://github.com/nulleimy/Goverdocs.git
+git clone https://github.com/cyberDJs/Goverdocs.git
 cd Goverdocs
 
 ./scripts/bootstrap_local.sh
@@ -460,7 +460,7 @@ Licenční rozhodnutí dokumentuje
 ## Zpětná vazba
 
 Chybu, nejasnost nebo návrh změny lze zaznamenat v
-[GitHub Issues](https://github.com/nulleimy/Goverdocs/issues).
+[GitHub Issues](https://github.com/cyberDJs/Goverdocs/issues).
 
 ---
 

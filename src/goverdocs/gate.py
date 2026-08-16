@@ -140,7 +140,7 @@ def _assess_evidence(
     as_of: date,
     trusted_verifiers: set[str],
 ) -> dict[str, Any]:
-    result = {
+    result: dict[str, Any] = {
         "id": str(record.get("evidence_id") or "UNKNOWN"),
         "record_digest": record_digest(record),
         "rule_id": str(record.get("rule_id") or ""),
@@ -190,7 +190,7 @@ def _assess_approval(
     trusted_verifiers: set[str],
 ) -> dict[str, Any]:
     actor = record.get("actor") if isinstance(record.get("actor"), dict) else {}
-    result = {
+    result: dict[str, Any] = {
         "id": str(record.get("approval_id") or "UNKNOWN"),
         "record_digest": record_digest(record),
         "rule_id": str(record.get("rule_id") or ""),
@@ -405,12 +405,12 @@ def evaluate_gate(
     if any(bool(item["blocking"]) for item in gaps):
         status = "BLOCKED"
         rationale = ["one or more blocking governance conditions are unresolved"]
-    elif gaps or obligations:
+    elif gaps:
         status = "WARN"
-        rationale = ["non-blocking obligations or evidence/freshness gaps require review"]
+        rationale = ["non-blocking evidence, freshness or drift gaps require review"]
     else:
         status = "PASS"
-        rationale = ["no blocking or warning governance conditions were detected"]
+        rationale = ["all detected obligations are satisfied for the declared evaluation scope"]
 
     return {
         "schema_version": 2,

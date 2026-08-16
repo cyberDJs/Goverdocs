@@ -49,5 +49,7 @@ def test_gate_report_matches_packaged_json_schema(monkeypatch, tmp_path: Path) -
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
 
     assert list(validator.iter_errors(report)) == []
-    assert report["schema_version"] == 1
+    assert report["schema_version"] == 2
+    assert len(report["input"]["change_digest"]) == 64
+    assert report["trust"]["trusted_verifiers"] == []
     assert report["status"] == "PASS"

@@ -211,7 +211,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 receipt = create_receipt(config.root, "health", "passed" if not issues else "failed", document_count=len(registry["documents"]), issues=[issue.to_dict() for issue in issues])
                 print(f"RECEIPT={receipt}")
             return 1 if issues else 0
-    except (FileNotFoundError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
     return 2

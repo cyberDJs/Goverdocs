@@ -70,6 +70,49 @@ def test_gate_blocks_when_explicit_approval_is_required(monkeypatch, tmp_path: P
     assert any(item["code"] == "EVIDENCE_UNVERIFIED" and not item["blocking"] for item in report["evidence_gaps"])
 
 
+def test_gate_warns_when_matrix_detection_outpaces_classifier(monkeypatch, tmp_path: Path) -> None:
+    paths = _policy_files(tmp_path)
+    fallback = Event("project_state_changed", 0.55, ["fallback classification"])
+
+    monkeypatch.setattr(gate, "classify", lambda changed_files, diff_text: [fallback])
+    monkeypatch.setattr(gate, "plan", lambda events, matrix_path: [])
+    monkeypatch.setattr(
+        gate,
+        "load_matrix",
+        lambda matrix_path: {
+            "rules": [
+                {
+                    "id": "DOC-EVT-011",
+                    "event": "architecture_change",
+                    "severity": "high",
+                    "priority": 80,
+                    "detection": {"any": [{"changed_paths": ["src/**"]}]},
+                    "required_evidence": [],
+                    "approval": {"required": True, "roles": ["project-owner"]},
+                }
+            ]
+        },
+    )
+    monkeypatch.setattr(gate, "validate_project", lambda *args, **kwargs: [])
+    monkeypatch.setattr(gate, "governed_documents", lambda root, policy_path: [])
+
+    report = gate.evaluate_gate(
+        root=tmp_path,
+        changed_files=["src/goverdocs/gate.py"],
+        diff_text="",
+        as_of=date(2026, 8, 17),
+        **paths,
+    )
+
+    drift = [item for item in report["evidence_gaps"] if item["code"] == "CLASSIFIER_MATRIX_DRIFT"]
+    assert report["status"] == "WARN"
+    assert len(drift) == 1
+    assert drift[0]["subject"] == "DOC-EVT-011"
+    assert "architecture_change" in drift[0]["message"]
+    assert "src/goverdocs/gate.py" in drift[0]["message"]
+    assert drift[0]["blocking"] is False
+
+
 def test_gate_warns_for_overdue_governed_document(monkeypatch, tmp_path: Path) -> None:
     paths = _policy_files(tmp_path)
     document = tmp_path / "PROJECT_STATE.md"

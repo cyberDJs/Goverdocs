@@ -7,7 +7,6 @@ import goverdocs.gate as gate
 from goverdocs.evidence import change_digest, validate_record
 from goverdocs.models import Event, Operation
 
-
 TRUSTED_VERIFIER = "github-api:cyberDJs/Goverdocs"
 REPOSITORY = "cyberDJs/Goverdocs"
 PR_NUMBER = 4

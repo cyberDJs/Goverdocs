@@ -7,7 +7,7 @@ VERIFIER_ID = "github-project-owner-comment-approval-v1"
 
 _MARKER = re.compile(
     r"^GOVERDOCS-APPROVAL-V1 role=project-owner pr=([1-9][0-9]*) "
-    r"head=([0-9a-f]{40}) decision=approved$"
+    r"head=([0-9a-f]{40}) decision=(approved|revoked)$"
 )
 
 
@@ -31,18 +31,23 @@ def project_owner_comment_approval_records(
     verified_at: str,
     valid_until: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Convert only strict, exact-head project-owner COMMENT reviews into approvals.
+    """Convert strict exact-head project-owner COMMENT markers into approvals.
 
-    A normal COMMENT review is never sufficient. The review body must consist
-    solely of the machine-readable GOVERDOCS-APPROVAL-V1 marker, the actor must
-    have an explicit project-owner role binding, and the marker, review commit,
-    PR number, and current observation HEAD must all agree exactly.
+    A normal COMMENT review is never sufficient. The body must consist solely
+    of the machine-readable GOVERDOCS-APPROVAL-V1 marker, the actor must have
+    an explicit project-owner role binding, and the marker, review commit, PR
+    number, and current observation HEAD must all agree exactly.
+
+    Approval lifecycle is fail-closed. For each project-owner actor on the
+    exact PR+HEAD, only that actor's latest valid marker is authoritative. A
+    later ``decision=revoked`` marker suppresses an earlier approval; a later
+    ``decision=approved`` marker explicitly re-authorizes the same exact head.
     """
     repository = str(observation["repository"])
     pull_request = int(observation["pull_request"])
     head_sha = str(observation["head_sha"])
-    results: list[dict[str, Any]] = []
 
+    latest_by_actor: dict[str, tuple[str, int, str, dict[str, Any]]] = {}
     for raw in observation.get("reviews", []):
         if not isinstance(raw, dict):
             continue
@@ -63,6 +68,17 @@ def project_owner_comment_approval_records(
             continue
 
         review_id = int(raw["id"])
+        submitted_at = str(raw.get("submitted_at") or "")
+        decision = match.group(3)
+        candidate = (submitted_at, review_id, decision, raw)
+        current = latest_by_actor.get(login)
+        if current is None or candidate[:2] > current[:2]:
+            latest_by_actor[login] = candidate
+
+    results: list[dict[str, Any]] = []
+    for login, (submitted_at, review_id, decision, raw) in sorted(latest_by_actor.items()):
+        if decision != "approved":
+            continue
         results.append(
             {
                 "schema_version": 1,
@@ -81,7 +97,7 @@ def project_owner_comment_approval_records(
                     "head_sha": head_sha,
                     "change_digest": change_digest,
                 },
-                "approved_at": str(raw["submitted_at"]),
+                "approved_at": submitted_at,
                 "source": {
                     "ref": str(
                         raw.get("html_url")

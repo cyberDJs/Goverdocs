@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from .github_source import GitHubReadError, GitHubReader
+from .github_source import GitHubReader, GitHubReadError
 
 GOVERNANCE_CHECK_CONTEXT = "GOVERDOCS Governance Gate"
 GITHUB_ACTIONS_APP_ID = 15368

@@ -1,0 +1,2 @@
+R10 stale-branch enforcement candidate.
+This branch must become unmergeable after main advances under strict required status checks.

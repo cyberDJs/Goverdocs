@@ -1,0 +1,2 @@
+GOVERDOCS governance check publication probe.
+This change exists only to verify exact-HEAD live Check publication and is not intended for merge.

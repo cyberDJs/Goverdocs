@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverdocs.local/schemas/github-check-publication.schema.json",
+  "title": "GOVERDOCS GitHub Check Publication Receipt v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "provider",
+    "repository",
+    "head_sha",
+    "gate_status",
+    "check_name",
+    "check_run_id",
+    "check_run_url",
+    "external_id",
+    "conclusion",
+    "report_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "provider": {"const": "github"},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "gate_status": {"enum": ["PASS", "WARN", "BLOCKED"]},
+    "check_name": {"type": "string", "minLength": 1},
+    "check_run_id": {"type": "integer", "minimum": 1},
+    "check_run_url": {"type": "string", "format": "uri"},
+    "external_id": {"type": "string", "pattern": "^goverdocs-gate-v2:[0-9a-f]{64}$"},
+    "conclusion": {"enum": ["success", "neutral", "failure"]},
+    "report_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

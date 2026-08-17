@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverdocs.dev/schemas/github-governance-run.schema.json",
+  "title": "GOVERDOCS GitHub PR Governance Run Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository",
+    "pull_request",
+    "head_sha",
+    "base_sha",
+    "evaluation_date",
+    "changeset_source_digest",
+    "github_observation_digest",
+    "generated_evidence_ids",
+    "generated_approval_ids",
+    "trusted_verifiers",
+    "gate_status",
+    "gate_report_digest",
+    "check_name",
+    "check_conclusion",
+    "published",
+    "publication_receipt"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "pull_request": {"type": "integer", "minimum": 1},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+    "evaluation_date": {"type": "string", "format": "date"},
+    "changeset_source_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "github_observation_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "generated_evidence_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "generated_approval_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "trusted_verifiers": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "gate_status": {"enum": ["PASS", "WARN", "BLOCKED"]},
+    "gate_report_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "check_name": {"type": "string", "minLength": 1},
+    "check_conclusion": {"enum": ["success", "neutral", "failure"]},
+    "published": {"type": "boolean"},
+    "publication_receipt": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "provider",
+            "repository",
+            "head_sha",
+            "gate_status",
+            "check_name",
+            "check_run_id",
+            "check_run_url",
+            "external_id",
+            "conclusion",
+            "report_digest"
+          ],
+          "properties": {
+            "schema_version": {"const": 1},
+            "provider": {"const": "github"},
+            "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+            "head_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+            "gate_status": {"enum": ["PASS", "WARN", "BLOCKED"]},
+            "check_name": {"type": "string", "minLength": 1},
+            "check_run_id": {"type": "integer", "minimum": 1},
+            "check_run_url": {"type": "string", "minLength": 1},
+            "external_id": {"type": "string", "minLength": 1},
+            "conclusion": {"enum": ["success", "neutral", "failure"]},
+            "report_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    }
+  }
+}

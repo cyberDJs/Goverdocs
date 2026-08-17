@@ -1,0 +1,75 @@
+name: goverdocs-governance
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+
+jobs:
+  governance:
+    name: governance gate publisher
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout canonical base only
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install canonical GOVERDOCS
+        run: python -m pip install --disable-pip-version-check -e .
+
+      - name: Evaluate PR and publish GOVERDOCS Check
+        id: governance
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_UPDATED_AT: ${{ github.event.pull_request.updated_at }}
+          DETAILS_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          as_of="${PR_UPDATED_AT%%T*}"
+          set +e
+          goverdocs-github-run \
+            --root . \
+            --repository "$GITHUB_REPOSITORY" \
+            --pull-request "$PR_NUMBER" \
+            --as-of "$as_of" \
+            --verified-at "${as_of}T23:59:59Z" \
+            --role-binding "nulleimy=project-owner" \
+            --trust-github-verifier \
+            --details-url "$DETAILS_URL" \
+            --publish \
+            > goverdocs-governance-run.json
+          rc=$?
+          set -e
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("goverdocs-governance-run.json").read_text(encoding="utf-8"))
+          receipt = result["run_receipt"]
+          print(f"GATE_STATUS={receipt['gate_status']}")
+          print(f"HEAD_SHA={receipt['head_sha']}")
+          print(f"CHECK_CONCLUSION={receipt['check_conclusion']}")
+          print(f"PUBLISHED={str(receipt['published']).lower()}")
+          PY
+          if [ "$rc" -eq 2 ]; then
+            exit 2
+          fi
+          exit 0

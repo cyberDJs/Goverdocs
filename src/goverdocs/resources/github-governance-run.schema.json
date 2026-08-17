@@ -32,7 +32,13 @@
     "evaluation_date": {"type": "string", "format": "date"},
     "changeset_source_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "github_observation_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "pr_evidence_contract_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "generated_evidence_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "generated_pr_contract_evidence_ids": {
       "type": "array",
       "items": {"type": "string", "minLength": 1},
       "uniqueItems": true

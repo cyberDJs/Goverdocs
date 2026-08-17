@@ -36,6 +36,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--approval-file", action="append", default=[], help="JSON Approval input; repeatable")
     parser.add_argument("--trusted-verifier", action="append", default=[], help="Explicit trusted verifier id; repeatable")
     parser.add_argument("--trust-github-verifier", action="store_true", help="Trust github-rest-source-v1 for records generated during this run")
+    parser.add_argument(
+        "--trust-pr-evidence-contract",
+        action="store_true",
+        help="Trust github-pr-evidence-contract-v1 for PR declaration evidence generated during this run",
+    )
     parser.add_argument("--check-name", default=DEFAULT_CHECK_NAME)
     parser.add_argument("--details-url")
     parser.add_argument("--publish", action="store_true", help="Publish the resulting GateReport as a GitHub Check Run")
@@ -78,6 +83,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             approvals=load_json_records(args.approval_file),
             trusted_verifiers=set(args.trusted_verifier),
             trust_github_verifier=bool(args.trust_github_verifier),
+            trust_pr_evidence_contract=bool(args.trust_pr_evidence_contract),
             verified_at=args.verified_at,
             writer=writer,
             publish=bool(args.publish),

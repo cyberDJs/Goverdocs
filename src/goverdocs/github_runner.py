@@ -15,6 +15,11 @@ from .github_check import (
     build_check_run_payload,
     publish_gate_check,
 )
+from .github_pr_evidence import VERIFIER_ID as PR_EVIDENCE_VERIFIER_ID
+from .github_pr_evidence import (
+    collect_pull_evidence_contract,
+    evidence_records_from_pr_contract,
+)
 from .github_source import GitHubReader, collect_pull_observation
 from .github_verifier import (
     VERIFIER_ID,
@@ -129,6 +134,7 @@ def run_github_pr_governance(
     approvals: list[dict[str, Any]] | None = None,
     trusted_verifiers: set[str] | None = None,
     trust_github_verifier: bool = False,
+    trust_pr_evidence_contract: bool = False,
     verified_at: str | None = None,
     writer: GitHubCheckWriter | None = None,
     publish: bool = False,
@@ -172,14 +178,30 @@ def run_github_pr_governance(
         role_bindings=role_bindings,
         verified_at=verification_time,
     )
+
+    pr_evidence_contract = collect_pull_evidence_contract(
+        reader,
+        repository=repository,
+        pull_request=pull_request,
+        expected_head_sha=str(gate_input["head_sha"]),
+        expected_base_sha=str(changeset["base_sha"]),
+    )
+    generated_pr_contract_evidence = evidence_records_from_pr_contract(
+        pr_evidence_contract,
+        preliminary,
+        verified_at=verification_time,
+    )
+
     if trust_github_verifier:
         trusted.add(VERIFIER_ID)
+    if trust_pr_evidence_contract:
+        trusted.add(PR_EVIDENCE_VERIFIER_ID)
 
     report = _evaluate(
         config,
         gate_input=gate_input,
         as_of=as_of,
-        evidence_items=[*evidence_items, *generated_evidence],
+        evidence_items=[*evidence_items, *generated_evidence, *generated_pr_contract_evidence],
         approvals=[*approvals, *generated_approvals],
         trusted_verifiers=trusted,
     )
@@ -212,7 +234,16 @@ def run_github_pr_governance(
         "evaluation_date": as_of.isoformat(),
         "changeset_source_digest": str(changeset["source_digest"]),
         "github_observation_digest": _digest(observation),
-        "generated_evidence_ids": [str(item["evidence_id"]) for item in generated_evidence],
+        "pr_evidence_contract_digest": str(pr_evidence_contract["source_digest"]),
+        "generated_evidence_ids": sorted(
+            [
+                *(str(item["evidence_id"]) for item in generated_evidence),
+                *(str(item["evidence_id"]) for item in generated_pr_contract_evidence),
+            ]
+        ),
+        "generated_pr_contract_evidence_ids": [
+            str(item["evidence_id"]) for item in generated_pr_contract_evidence
+        ],
         "generated_approval_ids": [str(item["approval_id"]) for item in generated_approvals],
         "trusted_verifiers": sorted(trusted),
         "gate_status": str(report["status"]),

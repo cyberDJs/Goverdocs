@@ -53,6 +53,7 @@ jobs:
             --verified-at "${as_of}T23:59:59Z" \
             --role-binding "nulleimy=project-owner" \
             --trust-github-verifier \
+            --trust-pr-evidence-contract \
             --details-url "$DETAILS_URL" \
             --publish \
             > goverdocs-governance-run.json

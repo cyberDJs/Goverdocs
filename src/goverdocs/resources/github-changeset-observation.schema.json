@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverdocs.dev/schemas/github-changeset-observation.schema.json",
+  "title": "GOVERDOCS GitHub ChangeSet Observation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "repository",
+    "pull_request",
+    "head_sha",
+    "base_sha",
+    "expected_changed_files",
+    "fetched_changed_files",
+    "complete",
+    "incomplete_reasons",
+    "changed_files",
+    "patch_unavailable_paths",
+    "files",
+    "diff_text",
+    "source_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "api", "endpoint", "repository", "pull_request"],
+      "properties": {
+        "provider": {"const": "github"},
+        "api": {"const": "rest"},
+        "endpoint": {"const": "list-pull-request-files"},
+        "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+        "pull_request": {"type": "integer", "minimum": 1}
+      }
+    },
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "pull_request": {"type": "integer", "minimum": 1},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+    "expected_changed_files": {"type": "integer", "minimum": 0},
+    "fetched_changed_files": {"type": "integer", "minimum": 0, "maximum": 3000},
+    "complete": {"type": "boolean"},
+    "incomplete_reasons": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "changed_file_count_mismatch",
+          "github_file_list_limit_exceeded",
+          "one_or_more_patches_unavailable"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "patch_unavailable_paths": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 3000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "filename",
+          "previous_filename",
+          "status",
+          "blob_sha",
+          "additions",
+          "deletions",
+          "changes",
+          "patch_available",
+          "patch",
+          "patch_digest"
+        ],
+        "properties": {
+          "filename": {"type": "string", "minLength": 1},
+          "previous_filename": {"type": ["string", "null"]},
+          "status": {"type": "string", "minLength": 1},
+          "blob_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+          "additions": {"type": "integer", "minimum": 0},
+          "deletions": {"type": "integer", "minimum": 0},
+          "changes": {"type": "integer", "minimum": 0},
+          "patch_available": {"type": "boolean"},
+          "patch": {"type": ["string", "null"]},
+          "patch_digest": {
+            "oneOf": [
+              {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              {"type": "null"}
+            ]
+          }
+        }
+      }
+    },
+    "diff_text": {"type": "string"},
+    "source_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

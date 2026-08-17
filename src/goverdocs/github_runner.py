@@ -20,6 +20,8 @@ from .github_pr_evidence import (
     collect_pull_evidence_contract,
     evidence_records_from_pr_contract,
 )
+from .github_project_owner_approval import VERIFIER_ID as PROJECT_OWNER_COMMENT_VERIFIER_ID
+from .github_project_owner_approval import project_owner_comment_approval_records
 from .github_source import GitHubReader, collect_pull_observation
 from .github_verifier import (
     VERIFIER_ID,
@@ -77,6 +79,7 @@ def _generated_github_records(
     *,
     role_bindings: dict[str, str],
     verified_at: str,
+    include_project_owner_comment_approval: bool,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     raw_input = preliminary_report.get("input")
     if not isinstance(raw_input, dict):
@@ -113,6 +116,17 @@ def _generated_github_records(
                 role_bindings=role_bindings,
                 verified_at=verified_at,
             )
+            if include_project_owner_comment_approval:
+                records.extend(
+                    project_owner_comment_approval_records(
+                        observation,
+                        rule_id=rule_id,
+                        approval_type=event or rule_id,
+                        change_digest=raw_change_digest,
+                        role_bindings=role_bindings,
+                        verified_at=verified_at,
+                    )
+                )
             for record in records:
                 record["approval_id"] = f"{record['approval_id']}-{rule_id.lower()}"
                 approvals.append(record)
@@ -135,6 +149,7 @@ def run_github_pr_governance(
     trusted_verifiers: set[str] | None = None,
     trust_github_verifier: bool = False,
     trust_pr_evidence_contract: bool = False,
+    trust_project_owner_comment_approval: bool = False,
     verified_at: str | None = None,
     writer: GitHubCheckWriter | None = None,
     publish: bool = False,
@@ -177,6 +192,7 @@ def run_github_pr_governance(
         preliminary,
         role_bindings=role_bindings,
         verified_at=verification_time,
+        include_project_owner_comment_approval=trust_project_owner_comment_approval,
     )
 
     pr_evidence_contract = collect_pull_evidence_contract(
@@ -196,6 +212,8 @@ def run_github_pr_governance(
         trusted.add(VERIFIER_ID)
     if trust_pr_evidence_contract:
         trusted.add(PR_EVIDENCE_VERIFIER_ID)
+    if trust_project_owner_comment_approval:
+        trusted.add(PROJECT_OWNER_COMMENT_VERIFIER_ID)
 
     report = _evaluate(
         config,

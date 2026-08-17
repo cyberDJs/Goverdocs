@@ -15,8 +15,8 @@ from .github_check import (
     build_check_run_payload,
     publish_gate_check,
 )
+from .github_pr_evidence import VERIFIER_ID as PR_EVIDENCE_VERIFIER_ID
 from .github_pr_evidence import (
-    VERIFIER_ID as PR_EVIDENCE_VERIFIER_ID,
     collect_pull_evidence_contract,
     evidence_records_from_pr_contract,
 )

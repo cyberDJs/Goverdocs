@@ -5,7 +5,7 @@ import json
 import re
 from typing import Any
 
-from .github_source import GitHubReadError, GitHubReader
+from .github_source import GitHubReader, GitHubReadError
 
 VERIFIER_ID = "github-pr-evidence-contract-v1"
 

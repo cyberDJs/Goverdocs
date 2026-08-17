@@ -2,11 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from goverdocs.authority import (
-    AuthorityPolicyError,
-    apply_authority_policy,
-    load_authority_policy,
-)
+from goverdocs.authority import AuthorityPolicyError, apply_authority_policy, load_authority_policy
 
 
 POLICY_TEXT = """\
@@ -90,11 +86,7 @@ def _report(
 def _codes(report: dict[str, object]) -> list[str]:
     gaps = report["evidence_gaps"]
     assert isinstance(gaps, list)
-    return sorted(
-        str(item["code"])
-        for item in gaps
-        if isinstance(item, dict)
-    )
+    return sorted(str(item["code"]) for item in gaps if isinstance(item, dict))
 
 
 def test_load_authority_policy_normalizes_roles_and_profile(tmp_path: Path) -> None:

@@ -26,6 +26,13 @@ KEYWORD_RULES: list[tuple[str, tuple[str, ...], float]] = [
     ("integration_interface_change", ("integration interface", "adapter contract", "provider interface"), 0.77),
 ]
 
+# The decision matrix is a multi-source event catalog. These sets declare the
+# detection domains that the changeset classifier itself owns. Matrix-only
+# validator, label, or external events must not be treated as classifier drift.
+# planner.load_matrix consumes these declarations to build the runtime matrix view.
+CLASSIFIER_PATH_EVENTS: frozenset[str] = frozenset(event for event, _, _ in PATH_RULES)
+CLASSIFIER_SEMANTIC_EVENTS: frozenset[str] = frozenset(event for event, _, _ in KEYWORD_RULES)
+
 
 def classify(changed_files: list[str], diff_text: str = "") -> list[Event]:
     detected: dict[str, Event] = {}

@@ -5,8 +5,8 @@ title: Establish the Constitutional Framework
 status: completed
 owner: GOVERDOCS
 created: 2026-07-26
-updated: 2026-07-26
-version: 1.0.0
+updated: 2026-08-17
+version: 1.0.1
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -21,8 +21,10 @@ related:
 source_refs:
   - SESSION-2026-07-26-01
   - SESSION-2026-07-26-02
-last_verified: 2026-07-26
-review_due: 2026-08-15
+  - GITHUB-MAIN-b002135d4ce532c451bf6eee9cd9c8782431ee92
+  - GITHUB-RELEASE-v0.1.0@018d8b7d5f5ab12f537991fe565b9dae4af3b0d9
+last_verified: 2026-08-17
+review_due: 2026-09-17
 ---
 
 # WB-0003: Establish the Constitutional Framework
@@ -97,3 +99,19 @@ commit use a normal revert; never rewrite shared history.
 
 WB-0003 is completed. Tag, release, deployment, adoption and product-impact
 verification remain outside this work block.
+
+## Revalidation — 2026-08-17
+
+WB-0003 remains correctly `completed`; no reopening or supersession is needed.
+Its original goal, non-goals and exact verification evidence remain historical
+facts for the bounded 2026-07-26 work block.
+
+Current GitHub revalidation was performed against
+`main@b002135d4ce532c451bf6eee9cd9c8782431ee92`. A later separately governed
+release `v0.1.0` exists at
+`018d8b7d5f5ab12f537991fe565b9dae4af3b0d9`. Because release creation was a
+non-goal of WB-0003, that later release does not change this work block's
+completion semantics.
+
+No current local Git state is asserted by this revalidation. Next review is due
+`2026-09-17`.

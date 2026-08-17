@@ -31,7 +31,7 @@ artifacts:
     introduced: 2026-07-26
     integrity:
       algorithm: sha256
-      digest: 06904275f4cf13b1e2e2f393e4e2452c2cdc3097e1e3c8527591695f7a86453e
+      digest: 11cc61a2d06251548c4b884feb5fbca6acea54b55a632d934f1190efc88878bb
 
   - id: GOVERDOCS-PRODUCT-OPERATING-MODE
     path: PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
@@ -42,7 +42,7 @@ artifacts:
     introduced: 2026-07-26
     integrity:
       algorithm: sha256
-      digest: cad1711f65db016594ddc3fcd1583d84e1a74a494ff086358bf80ef75b91b01a
+      digest: b71e46b10b2edebabff7ee3a341c471934924c4c4738dc72c9dd55ff327cc495
 
   - id: GOVERDOCS-CHANGE-GATE-10-OF-10
     path: policies/CHANGE_GATE_10_OF_10.yaml

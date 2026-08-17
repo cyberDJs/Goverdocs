@@ -5,8 +5,8 @@ title: GOVERDOCS Constitutional Framework
 status: active
 owner: GOVERDOCS
 created: 2026-07-26
-updated: 2026-07-26
-version: 1.0.0
+updated: 2026-08-17
+version: 1.0.1
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -21,8 +21,10 @@ related:
 source_refs:
   - SESSION-2026-07-26-01
   - SESSION-2026-07-26-02
-last_verified: 2026-07-26
-review_due: 2026-08-15
+  - GITHUB-MAIN-b002135d4ce532c451bf6eee9cd9c8782431ee92
+  - GITHUB-RELEASE-v0.1.0@018d8b7d5f5ab12f537991fe565b9dae4af3b0d9
+last_verified: 2026-08-17
+review_due: 2026-09-17
 ---
 
 # GOVERDOCS CONSTITUTIONAL FRAMEWORK
@@ -320,3 +322,19 @@ Aktivace `1.0.0` je omezena na `warn-only` governance scope a je doložena:
 
 Tag, release, deployment, adopce a produktový dopad nejsou součástí tohoto
 přijetí a zůstávají samostatnými approval gates nebo následnými důkazy.
+
+## 14. Revalidation — 2026-08-17
+
+The normative framework remains valid without supersession. The original
+`1.0.0` acceptance evidence above remains historical evidence for its bounded
+`warn-only` scope and is not rewritten by this review.
+
+Current GitHub revalidation was performed against canonical
+`main@b002135d4ce532c451bf6eee9cd9c8782431ee92`. A later separately governed
+release `v0.1.0` exists and targets
+`018d8b7d5f5ab12f537991fe565b9dae4af3b0d9`. That release is subsequent
+evidence under its own approval gate and does not retroactively change the
+original framework activation scope.
+
+This revalidation makes no claim about current local Git state, deployment,
+adoption or verified product impact. Next review is due `2026-09-17`.

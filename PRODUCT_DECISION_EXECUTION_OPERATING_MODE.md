@@ -5,8 +5,8 @@ title: Product, Decision and Execution Operating Mode
 status: active
 owner: GOVERDOCS
 created: 2026-07-26
-updated: 2026-07-26
-version: 1.0.0
+updated: 2026-08-17
+version: 1.0.1
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -21,8 +21,10 @@ related:
 source_refs:
   - SESSION-2026-07-26-01
   - SESSION-2026-07-26-02
-last_verified: 2026-07-26
-review_due: 2026-08-15
+  - GITHUB-MAIN-b002135d4ce532c451bf6eee9cd9c8782431ee92
+  - GITHUB-RELEASE-v0.1.0@018d8b7d5f5ab12f537991fe565b9dae4af3b0d9
+last_verified: 2026-08-17
+review_due: 2026-09-17
 ---
 
 # PRODUCT, DECISION AND EXECUTION OPERATING MODE
@@ -412,3 +414,18 @@ quality run `30191576044`, OpenSSF Scorecard run `30191576042` a artefaktové
 digesty zaznamenané v `REV-0003`.
 
 Tento stav nedokazuje adopci, produktový dopad, release ani deployment.
+
+## 19. Revalidation — 2026-08-17
+
+The operating mode remains normatively valid without supersession. The original
+`1.0.0` acceptance evidence remains historical evidence for its bounded scope.
+
+Current GitHub revalidation was performed against canonical
+`main@b002135d4ce532c451bf6eee9cd9c8782431ee92`. A later separately governed
+release `v0.1.0` exists and targets
+`018d8b7d5f5ab12f537991fe565b9dae4af3b0d9`. The existence of that release does
+not by itself prove adoption or product impact and does not weaken the operating
+mode's separation of approval gates.
+
+No current local Git or deployment state is asserted by this revalidation. Next
+review is due `2026-09-17`.

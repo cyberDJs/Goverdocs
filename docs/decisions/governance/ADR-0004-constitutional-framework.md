@@ -5,8 +5,8 @@ title: Establish a Constitutional Framework with Scoped Operating Modes
 status: accepted
 owner: GOVERDOCS
 created: 2026-07-26
-updated: 2026-07-26
-version: 1.0.0
+updated: 2026-08-17
+version: 1.0.1
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -21,8 +21,10 @@ related:
 source_refs:
   - SESSION-2026-07-26-01
   - SESSION-2026-07-26-02
-last_verified: 2026-07-26
-review_due: 2026-08-15
+  - GITHUB-MAIN-b002135d4ce532c451bf6eee9cd9c8782431ee92
+  - GITHUB-RELEASE-v0.1.0@018d8b7d5f5ab12f537991fe565b9dae4af3b0d9
+last_verified: 2026-08-17
+review_due: 2026-09-17
 ---
 
 # ADR-0004: Establish a Constitutional Framework with Scoped Operating Modes
@@ -103,3 +105,19 @@ were separately approved; quality run `30191576044` and OpenSSF Scorecard run
 
 Tag, release, deployment, hard enforcement and autonomous canonical writes are
 not approved by this decision.
+
+## Revalidation — 2026-08-17
+
+The decision itself remains valid and is not superseded. The original acceptance
+and its exact SHA/run evidence remain historical evidence for the bounded
+`warn-only` decision.
+
+Current GitHub revalidation was performed against canonical
+`main@b002135d4ce532c451bf6eee9cd9c8782431ee92`. A later, separately governed
+release `v0.1.0` exists and targets
+`018d8b7d5f5ab12f537991fe565b9dae4af3b0d9`. That later release does not
+retroactively widen ADR-0004 approval: deployment, hard enforcement and
+autonomous canonical writes remain outside this decision.
+
+This revalidation makes no claim about current local Git state. Next review is
+due `2026-09-17`.

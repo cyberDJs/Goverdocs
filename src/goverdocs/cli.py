@@ -4,10 +4,13 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
+from datetime import date
 from pathlib import Path
 
 from .classifier import changed_from_git, classify
 from .config import load_config
+from .evidence import load_json_records
+from .gate import evaluate_gate
 from .indexer import rebuild_index
 from .initializer import initialize_project
 from .planner import plan
@@ -43,6 +46,20 @@ def build_parser() -> argparse.ArgumentParser:
         cmd.add_argument("--changed-file", action="append", default=[])
         cmd.add_argument("--diff-text-file")
         cmd.add_argument("--json", action="store_true")
+    gate = sub.add_parser("gate")
+    gate.add_argument("--root")
+    gate.add_argument("--diff", default="HEAD~1..HEAD")
+    gate.add_argument("--changed-file", action="append", default=[])
+    gate.add_argument("--diff-text-file")
+    gate.add_argument("--as-of", help="Evaluation date in YYYY-MM-DD; defaults to today")
+    gate.add_argument("--repository", help="Repository identity, for example owner/name")
+    gate.add_argument("--pull-request", type=int, help="Pull request number for exact approval binding")
+    gate.add_argument("--head-sha", help="Exact 40-character Git head SHA for approval binding")
+    gate.add_argument("--evidence-file", action="append", default=[], help="JSON EvidenceItem file; repeatable")
+    gate.add_argument("--approval-file", action="append", default=[], help="JSON Approval file; repeatable")
+    gate.add_argument("--trusted-verifier", action="append", default=[], help="Verifier identity explicitly trusted for this run; repeatable")
+    gate.add_argument("--json", action="store_true")
+    gate.add_argument("--receipt", action="store_true")
     validate = sub.add_parser("validate")
     validate.add_argument("--root")
     validate.add_argument("--json", action="store_true")
@@ -83,6 +100,47 @@ def main(argv: Sequence[str] | None = None) -> int:
                 for item in registry["documents"]:
                     print(f"{str(item.get('id')):<24} {str(item.get('status')):<12} {item.get('path')}")
             return 0
+        if args.command == "gate":
+            files, diff_text = _change_input(config.root, args.diff, args.changed_file, args.diff_text_file)
+            evaluation_date = date.fromisoformat(args.as_of) if args.as_of else date.today()
+            evidence_items = load_json_records(args.evidence_file)
+            approvals = load_json_records(args.approval_file)
+            report = evaluate_gate(
+                root=config.root,
+                policy_path=config.policy_path,
+                matrix_path=config.matrix_path,
+                metadata_schema_path=config.metadata_schema_path,
+                change_gate_path=config.change_gate_path,
+                change_gate_schema_path=config.change_gate_schema_path,
+                changed_files=files,
+                diff_text=diff_text,
+                as_of=evaluation_date,
+                repository=args.repository,
+                pull_request=args.pull_request,
+                head_sha=args.head_sha,
+                evidence_items=evidence_items,
+                approvals=approvals,
+                trusted_verifiers=set(args.trusted_verifier),
+            )
+            if args.json:
+                print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                print(f"GOVERNANCE GATE={report['status']}")
+                print(f"EVALUATION_DATE={report['evaluation_date']}")
+                print(f"INPUT_DIGEST={report['input']['digest']}")
+                print(f"CHANGE_DIGEST={report['input']['change_digest']}")
+                print(f"EVENTS={len(report['events'])}")
+                print(f"OBLIGATIONS={len(report['obligations'])}")
+                print(f"EVIDENCE_INPUTS={len(report['evidence_inputs'])}")
+                print(f"APPROVAL_INPUTS={len(report['approval_inputs'])}")
+                print(f"EVIDENCE_GAPS={len(report['evidence_gaps'])}")
+                for gap in report["evidence_gaps"]:
+                    marker = "BLOCK" if gap["blocking"] else "WARN"
+                    print(f"{marker:<5} {gap['code']:<28} {gap['subject']}: {gap['message']}")
+            if args.receipt:
+                receipt = create_receipt(config.root, "gate", report["status"].lower(), gate_report=report)
+                print(f"RECEIPT={receipt}")
+            return 1 if report["status"] == "BLOCKED" else 0
         if args.command in {"classify", "plan"}:
             files, diff_text = _change_input(config.root, args.diff, args.changed_file, args.diff_text_file)
             events = classify(files, diff_text)

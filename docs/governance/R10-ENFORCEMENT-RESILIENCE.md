@@ -1,5 +1,5 @@
 ---
-id: GOV-0003
+id: GOV-0004
 type: governance
 title: R10 Enforcement Resilience / Bypass and Failure-Mode Proof
 status: active

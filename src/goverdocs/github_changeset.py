@@ -4,7 +4,7 @@ import hashlib
 import json
 from typing import Any
 
-from .github_source import GitHubReadError, GitHubReader
+from .github_source import GitHubReader, GitHubReadError
 
 _MAX_FILES = 3000
 _PAGE_SIZE = 100

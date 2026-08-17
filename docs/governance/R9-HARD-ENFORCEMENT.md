@@ -1,3 +1,25 @@
+---
+id: GOV-0002
+type: governance
+title: R9 Hard Enforcement / Required Governance Check
+status: active
+owner: GOVERDOCS
+created: 2026-08-17
+updated: 2026-08-17
+version: 1.0.0
+canonical: true
+managed_by: mixed
+write_policy: approval-required
+supersedes: null
+superseded_by: null
+related:
+  - GOV-0001
+source_refs:
+  - GH-ISSUE-23
+last_verified: 2026-08-17
+review_due: null
+---
+
 # R9 — Hard Enforcement / Required Governance Check
 
 ## Purpose

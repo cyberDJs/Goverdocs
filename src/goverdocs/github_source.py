@@ -160,6 +160,7 @@ def collect_pull_observation(
                 "state": _required_str(item, "state", "review").upper(),
                 "commit_id": _required_str(item, "commit_id", "review"),
                 "submitted_at": _required_str(item, "submitted_at", "review"),
+                "body": str(item.get("body") or ""),
                 "author_association": str(item.get("author_association") or ""),
                 "html_url": str(item.get("html_url") or ""),
             }

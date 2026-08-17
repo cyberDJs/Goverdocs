@@ -30,13 +30,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check -e '.[dev]'
 
       - name: Ruff
-        shell: bash
-        run: |
-          set +e
-          ruff check --fix .
-          fixed="$(head -n 10 tests/test_authority.py | base64 -w0)"
-          echo "::error file=tests/test_authority.py,line=1::R11_RUFF_FIXED_HEAD_B64=${fixed}"
-          exit 1
+        run: ruff check .
 
       - name: mypy
         run: mypy src

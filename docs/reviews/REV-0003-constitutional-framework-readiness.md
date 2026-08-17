@@ -5,8 +5,8 @@ title: Constitutional Framework Readiness Review
 status: accepted
 owner: GOVERDOCS
 created: 2026-07-26
-updated: 2026-07-26
-version: 1.0.0
+updated: 2026-08-17
+version: 1.0.1
 canonical: true
 managed_by: mixed
 write_policy: approval-required
@@ -20,8 +20,10 @@ related:
 source_refs:
   - SESSION-2026-07-26-01
   - SESSION-2026-07-26-02
-last_verified: 2026-07-26
-review_due: 2026-08-15
+  - GITHUB-MAIN-b002135d4ce532c451bf6eee9cd9c8782431ee92
+  - GITHUB-RELEASE-v0.1.0@018d8b7d5f5ab12f537991fe565b9dae4af3b0d9
+last_verified: 2026-08-17
+review_due: 2026-09-17
 ---
 
 # REV-0003: Constitutional Framework Readiness Review
@@ -87,8 +89,11 @@ and then pass the complete canonical local gate set again.
 - `blocked_count`: 0
 - `declared_scope`: constitutional framework `1.0.0`, product operating mode
   `1.0.0`, active warn-only change gate and closure records
-- `environment`: canonical repository `/Users/eimyna/GOVERDOCS`, branch `main`,
-  exact implementation SHA `6236a8cae777063811b41ae00fb36f819f8468e7`, GitHub Actions
+- `environment`: historical review environment recorded on 2026-07-26 as
+  `/Users/eimyna/GOVERDOCS`, branch `main`, exact implementation SHA
+  `6236a8cae777063811b41ae00fb36f819f8468e7`, GitHub Actions. This historical
+  path is not asserted as the current canonical local workspace and is not
+  locally re-verified by the 2026-08-17 review.
 - `evidence_refs`: ADR-0004, WB-0003, runs `30191576044` and `30191576042`,
   artifacts `8628731800`, `8628731425` and `8628727141`
 
@@ -110,3 +115,19 @@ and then pass the complete canonical local gate set again.
 Status is `accepted` for the declared warn-only scope. The framework is remotely
 verified for exact SHA `6236a8cae777063811b41ae00fb36f819f8468e7`. This review does not claim tag, release,
 deployment, adoption or verified product impact.
+
+## Revalidation addendum — 2026-08-17
+
+The original readiness decision remains accepted for its declared historical
+scope. Its SHA, CI and artifact evidence are preserved without reinterpretation.
+
+Current repository evidence verifies canonical
+`main@b002135d4ce532c451bf6eee9cd9c8782431ee92`. A later, separately governed
+release `v0.1.0` exists at exact target
+`018d8b7d5f5ab12f537991fe565b9dae4af3b0d9`; this does not alter what REV-0003
+claimed or approved on 2026-07-26.
+
+The previous local path is retained only as historical review context. This
+revalidation does not claim current local Git verification. The constitutional
+framework remains suitable for continued warn-only governance use; no
+supersession is required. Next review is due `2026-09-17`.

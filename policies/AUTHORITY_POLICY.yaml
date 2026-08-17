@@ -1,0 +1,21 @@
+version: 1
+roles:
+  project-owner:
+    capabilities:
+      - approve:standard
+      - approve:critical-owner
+      - revoke:own
+  independent-reviewer:
+    capabilities:
+      - approve:standard
+      - approve:critical-independent
+      - revoke:own
+
+profiles:
+  critical:
+    min_distinct_actors: 2
+    min_distinct_roles: 2
+    forbid_author_approval: true
+    required_capabilities:
+      - approve:critical-owner
+      - approve:critical-independent

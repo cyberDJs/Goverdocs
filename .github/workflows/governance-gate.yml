@@ -45,8 +45,9 @@ jobs:
           set -u
           as_of="${PR_UPDATED_AT%%T*}"
           set +e
-          goverdocs-github-run \
+          python -m goverdocs.github_authority_cli \
             --root . \
+            --authority-policy policies/AUTHORITY_POLICY.yaml \
             --repository "$GITHUB_REPOSITORY" \
             --pull-request "$PR_NUMBER" \
             --as-of "$as_of" \

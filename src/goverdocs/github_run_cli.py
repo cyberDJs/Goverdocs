@@ -41,6 +41,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Trust github-pr-evidence-contract-v1 for PR declaration evidence generated during this run",
     )
+    parser.add_argument(
+        "--trust-project-owner-comment-approval",
+        action="store_true",
+        help=(
+            "Trust strict GOVERDOCS-APPROVAL-V1 COMMENT reviews from explicitly role-bound project owners; "
+            "normal comments never become approvals"
+        ),
+    )
     parser.add_argument("--check-name", default=DEFAULT_CHECK_NAME)
     parser.add_argument("--details-url")
     parser.add_argument("--publish", action="store_true", help="Publish the resulting GateReport as a GitHub Check Run")
@@ -84,6 +92,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             trusted_verifiers=set(args.trusted_verifier),
             trust_github_verifier=bool(args.trust_github_verifier),
             trust_pr_evidence_contract=bool(args.trust_pr_evidence_contract),
+            trust_project_owner_comment_approval=bool(args.trust_project_owner_comment_approval),
             verified_at=args.verified_at,
             writer=writer,
             publish=bool(args.publish),

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverdocs.local/schemas/github-observation.schema.json",
+  "title": "GOVERDOCS GitHubObservation v1",
+  "type": "object",
+  "required": ["schema_version", "source", "repository", "pull_request", "head_sha", "base_sha", "state", "draft", "merged", "author", "reviews", "check_runs"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {"type": "object"},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "pull_request": {"type": "integer", "minimum": 1},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "state": {"type": "string"},
+    "draft": {"type": "boolean"},
+    "merged": {"type": "boolean"},
+    "author": {
+      "type": "object",
+      "required": ["id", "login"],
+      "properties": {"id": {"type": "integer"}, "login": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "reviews": {"type": "array", "items": {"type": "object"}},
+    "check_runs": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

@@ -10,23 +10,47 @@ HEAD = "a" * 40
 CHANGE = "c" * 64
 
 
+def _review(
+    *,
+    review_id: int,
+    body: str,
+    submitted_at: str,
+    commit_id: str = HEAD,
+    state: str = "COMMENTED",
+    login: str = "owner",
+) -> dict[str, object]:
+    return {
+        "id": review_id,
+        "actor": {"id": 1, "login": login},
+        "state": state,
+        "commit_id": commit_id,
+        "submitted_at": submitted_at,
+        "body": body,
+        "author_association": "OWNER",
+        "html_url": f"https://github.com/nulleimy/Goverdocs/pull/15#pullrequestreview-{review_id}",
+    }
+
+
 def _observation(*, body: str, commit_id: str = HEAD, state: str = "COMMENTED") -> dict[str, object]:
+    return _observation_with_reviews(
+        [
+            _review(
+                review_id=99,
+                body=body,
+                submitted_at="2026-08-17T03:05:58Z",
+                commit_id=commit_id,
+                state=state,
+            )
+        ]
+    )
+
+
+def _observation_with_reviews(reviews: list[dict[str, object]]) -> dict[str, object]:
     return {
         "repository": "nulleimy/Goverdocs",
         "pull_request": 15,
         "head_sha": HEAD,
-        "reviews": [
-            {
-                "id": 99,
-                "actor": {"id": 1, "login": "owner"},
-                "state": state,
-                "commit_id": commit_id,
-                "submitted_at": "2026-08-17T03:05:58Z",
-                "body": body,
-                "author_association": "OWNER",
-                "html_url": "https://github.com/nulleimy/Goverdocs/pull/15#pullrequestreview-99",
-            }
-        ],
+        "reviews": reviews,
     }
 
 
@@ -75,3 +99,46 @@ def test_wrong_role_wrong_pr_or_stale_head_fail_closed() -> None:
 def test_marker_must_be_the_entire_comment_body() -> None:
     marker = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=approved"
     assert _records(_observation(body=f"approved\n{marker}"), {"owner": "project-owner"}) == []
+
+
+def test_later_exact_head_revocation_invalidates_earlier_approval() -> None:
+    approved = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=approved"
+    revoked = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=revoked"
+    observation = _observation_with_reviews(
+        [
+            _review(review_id=99, body=approved, submitted_at="2026-08-17T03:05:58Z"),
+            _review(review_id=100, body=revoked, submitted_at="2026-08-17T03:06:58Z"),
+        ]
+    )
+
+    assert _records(observation, {"owner": "project-owner"}) == []
+
+
+def test_later_exact_head_approval_can_reauthorize_after_revocation() -> None:
+    approved = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=approved"
+    revoked = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=revoked"
+    observation = _observation_with_reviews(
+        [
+            _review(review_id=99, body=approved, submitted_at="2026-08-17T03:05:58Z"),
+            _review(review_id=100, body=revoked, submitted_at="2026-08-17T03:06:58Z"),
+            _review(review_id=101, body=approved, submitted_at="2026-08-17T03:07:58Z"),
+        ]
+    )
+
+    records = _records(observation, {"owner": "project-owner"})
+    assert [record["approval_id"] for record in records] == ["github-project-owner-comment-101"]
+
+
+def test_revocation_is_actor_scoped_when_multiple_project_owners_exist() -> None:
+    approved = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=approved"
+    revoked = f"GOVERDOCS-APPROVAL-V1 role=project-owner pr=15 head={HEAD} decision=revoked"
+    observation = _observation_with_reviews(
+        [
+            _review(review_id=99, body=approved, submitted_at="2026-08-17T03:05:58Z", login="owner"),
+            _review(review_id=100, body=approved, submitted_at="2026-08-17T03:05:59Z", login="backup"),
+            _review(review_id=101, body=revoked, submitted_at="2026-08-17T03:06:58Z", login="owner"),
+        ]
+    )
+
+    records = _records(observation, {"owner": "project-owner", "backup": "project-owner"})
+    assert [record["approval_id"] for record in records] == ["github-project-owner-comment-100"]

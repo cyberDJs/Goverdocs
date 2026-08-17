@@ -4,7 +4,6 @@ import pytest
 
 from goverdocs.authority import AuthorityPolicyError, apply_authority_policy, load_authority_policy
 
-
 POLICY_TEXT = """\
 version: 1
 roles:

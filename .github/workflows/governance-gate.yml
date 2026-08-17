@@ -54,6 +54,7 @@ jobs:
             --role-binding "nulleimy=project-owner" \
             --trust-github-verifier \
             --trust-pr-evidence-contract \
+            --trust-project-owner-comment-approval \
             --details-url "$DETAILS_URL" \
             --publish \
             > goverdocs-governance-run.json

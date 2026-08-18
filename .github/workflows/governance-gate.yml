@@ -5,6 +5,12 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, edited]
   pull_request_review:
     types: [submitted, dismissed]
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: Pull request number to reevaluate
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -40,6 +46,109 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_UPDATED_AT: ${{ github.event.pull_request.updated_at }}
+          DETAILS_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          as_of="${PR_UPDATED_AT%%T*}"
+          set +e
+          python -m goverdocs.github_authority_cli \
+            --root . \
+            --authority-policy policies/AUTHORITY_POLICY.yaml \
+            --repository "$GITHUB_REPOSITORY" \
+            --pull-request "$PR_NUMBER" \
+            --as-of "$as_of" \
+            --verified-at "${as_of}T23:59:59Z" \
+            --role-binding "nulleimy=project-owner" \
+            --role-binding "setarchitect=independent-reviewer" \
+            --trust-github-verifier \
+            --trust-pr-evidence-contract \
+            --trust-project-owner-comment-approval \
+            --details-url "$DETAILS_URL" \
+            --publish \
+            > goverdocs-governance-run.json
+          rc=$?
+          set -e
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("goverdocs-governance-run.json").read_text(encoding="utf-8"))
+          receipt = result["run_receipt"]
+          print(f"GATE_STATUS={receipt['gate_status']}")
+          print(f"HEAD_SHA={receipt['head_sha']}")
+          print(f"CHECK_CONCLUSION={receipt['check_conclusion']}")
+          print(f"PUBLISHED={str(receipt['published']).lower()}")
+          PY
+          if [ "$rc" -eq 2 ]; then
+            exit 2
+          fi
+          exit 0
+
+  governance-dispatch:
+    name: governance gate publisher / dispatch
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve exact PR subject
+        id: subject
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pull_request }}
+        run: |
+          set -euo pipefail
+          case "$PR_NUMBER" in
+            ''|*[!0-9]*)
+              echo "invalid pull request number: $PR_NUMBER" >&2
+              exit 2
+              ;;
+          esac
+
+          pr_json="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")"
+          draft="$(python -c 'import json,sys; print(str(json.load(sys.stdin)["draft"]).lower())' <<<"$pr_json")"
+          base_ref="$(python -c 'import json,sys; print(json.load(sys.stdin)["base"]["ref"])' <<<"$pr_json")"
+          base_sha="$(python -c 'import json,sys; print(json.load(sys.stdin)["base"]["sha"])' <<<"$pr_json")"
+          updated_at="$(python -c 'import json,sys; print(json.load(sys.stdin)["updated_at"])' <<<"$pr_json")"
+
+          if [ "$draft" != "false" ]; then
+            echo "refusing to reevaluate draft PR #$PR_NUMBER" >&2
+            exit 2
+          fi
+          if [ "$base_ref" != "main" ]; then
+            echo "refusing to reevaluate non-main PR #$PR_NUMBER base=$base_ref" >&2
+            exit 2
+          fi
+          if ! [[ "$base_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "invalid base SHA for PR #$PR_NUMBER" >&2
+            exit 2
+          fi
+
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          echo "updated_at=$updated_at" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout exact canonical PR base only
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ steps.subject.outputs.base_sha }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install canonical GOVERDOCS
+        run: python -m pip install --disable-pip-version-check -e .
+
+      - name: Reevaluation and publish GOVERDOCS Check
+        id: governance_dispatch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pull_request }}
+          PR_UPDATED_AT: ${{ steps.subject.outputs.updated_at }}
           DETAILS_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -u

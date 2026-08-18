@@ -23,7 +23,7 @@ jobs:
       - name: Inspect exact merge SHA checks and workflow runs
         env:
           GH_TOKEN: ${{ github.token }}
-          MERGE_SHA: b6d47531b53d571a24b235d686b836656c36c071
+          MERGE_SHA: adbc1a0100deecad96609ae9639afd063e006cf0
         shell: bash
         run: |
           set -euo pipefail

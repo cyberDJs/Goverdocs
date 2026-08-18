@@ -2,7 +2,7 @@ name: r11-positive-proof-author
 
 on:
   pull_request_target:
-    types: [opened]
+    types: [opened, reopened]
 
 permissions:
   contents: write
@@ -18,8 +18,8 @@ jobs:
     name: author neutral R11 critical proof
     if: >-
       github.repository_owner == 'nulleimy' &&
-      github.actor == 'nulleimy' &&
       github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.head.ref == 'proof/r11-positive-author-kick' &&
       github.event.pull_request.title == 'chore(governance): kick R11 neutral proof author'
     runs-on: ubuntu-latest

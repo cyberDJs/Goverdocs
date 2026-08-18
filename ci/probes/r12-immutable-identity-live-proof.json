@@ -1,0 +1,6 @@
+{
+  "id": "R12.1-IMMUTABLE-IDENTITY-LIVE-PROOF",
+  "purpose": "Bounded non-runtime CI subject proving canonical authority authorization through immutable GitHub numeric identity bindings.",
+  "runtime_effect": "none",
+  "tracks": ["GH-ISSUE-53", "GH-ISSUE-58"]
+}

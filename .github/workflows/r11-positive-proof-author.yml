@@ -1,8 +1,8 @@
 name: r11-positive-proof-author
 
 on:
-  issue_comment:
-    types: [created]
+  pull_request_target:
+    types: [opened]
 
 permissions:
   contents: write
@@ -18,9 +18,10 @@ jobs:
     name: author neutral R11 critical proof
     if: >-
       github.repository_owner == 'nulleimy' &&
-      github.event.issue.number == 35 &&
       github.actor == 'nulleimy' &&
-      github.event.comment.body == 'GOVERDOCS-R11-POSITIVE-PROOF-AUTHOR-KICK'
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'proof/r11-positive-author-kick' &&
+      github.event.pull_request.title == 'chore(governance): kick R11 neutral proof author'
     runs-on: ubuntu-latest
 
     steps:

@@ -1,0 +1,6 @@
+{
+  "id": "R12.1-LIVE-PROOF",
+  "purpose": "Bounded non-runtime CI acceptance subject for GH-ISSUE-58.",
+  "runtime_effect": "none",
+  "tracks": ["GH-ISSUE-53", "GH-ISSUE-58"]
+}

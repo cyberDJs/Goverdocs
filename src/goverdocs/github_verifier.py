@@ -110,6 +110,7 @@ def approved_review_records(
     change_digest: str,
     role_bindings: dict[str, str],
     verified_at: str,
+    actor_id_bindings: dict[str, int] | None = None,
     valid_until: str | None = None,
 ) -> list[dict[str, Any]]:
     repository = str(observation["repository"])
@@ -128,6 +129,21 @@ def approved_review_records(
         role = role_bindings.get(login)
         if not role:
             continue
+
+        authority_actor_id = f"github:{login}"
+        if actor_id_bindings is not None:
+            expected_user_id = actor_id_bindings.get(login)
+            observed_user_id = actor.get("id")
+            if expected_user_id is None:
+                continue
+            if (
+                not isinstance(observed_user_id, int)
+                or isinstance(observed_user_id, bool)
+                or observed_user_id != expected_user_id
+            ):
+                continue
+            authority_actor_id = f"github-user:{expected_user_id}"
+
         review_id = int(raw["id"])
         results.append(
             {
@@ -138,7 +154,7 @@ def approved_review_records(
                 "decision": "approved",
                 "actor": {
                     "provider": "github",
-                    "id": f"github:{login}",
+                    "id": authority_actor_id,
                     "role": role,
                 },
                 "subject": {

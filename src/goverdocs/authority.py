@@ -157,15 +157,21 @@ def apply_authority_policy(
     *,
     change_author: str,
     policy: dict[str, Any],
+    change_author_actor_id: str | None = None,
 ) -> dict[str, Any]:
-    """Apply R11 authority constraints to already-assessed approval records.
+    """Apply R11/R12 authority constraints to already-assessed approval records.
 
     R10 remains authoritative for record validity, freshness, verifier trust,
-    exact PR/head/change binding, and revocation. R11 only consumes approval
-    inputs whose Gate assessment status is VERIFIED.
+    exact PR/head/change binding, and revocation. R11 consumes only approval
+    inputs whose Gate assessment status is VERIFIED. R12 may additionally
+    provide the immutable GitHub actor id for anti-self-approval comparison.
     """
     if not isinstance(change_author, str) or not change_author.strip():
         raise AuthorityPolicyError("change_author must be a non-empty GitHub login")
+    if change_author_actor_id is not None and (
+        not isinstance(change_author_actor_id, str) or not change_author_actor_id.strip()
+    ):
+        raise AuthorityPolicyError("change_author_actor_id must be a non-empty string")
 
     result = copy.deepcopy(report)
     raw_obligations = result.get("obligations")
@@ -245,7 +251,7 @@ def apply_authority_policy(
             )
 
         eligible: dict[str, str] = {}
-        self_actor_id = f"github:{change_author}"
+        self_actor_id = change_author_actor_id or f"github:{change_author}"
         for actor_id, bound_roles in sorted(actor_roles.items()):
             if len(bound_roles) != 1:
                 continue

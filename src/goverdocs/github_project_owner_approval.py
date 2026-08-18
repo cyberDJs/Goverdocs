@@ -28,6 +28,7 @@ def project_owner_comment_approval_records(
     approval_type: str,
     change_digest: str,
     role_bindings: dict[str, str],
+    identity_bindings: dict[str, dict[str, str]] | None = None,
     verified_at: str,
     valid_until: str | None = None,
 ) -> list[dict[str, Any]]:
@@ -38,6 +39,9 @@ def project_owner_comment_approval_records(
     an explicit project-owner role binding, and the marker, review commit, PR
     number, and current observation HEAD must all agree exactly.
 
+    When canonical R12 identity bindings are supplied, both the observed login
+    and immutable GitHub numeric user id must match the active binding.
+
     Approval lifecycle is fail-closed. For each project-owner actor on the
     exact PR+HEAD, only that actor's latest valid marker is authoritative. A
     later ``decision=revoked`` marker suppresses an earlier approval; a later
@@ -47,7 +51,7 @@ def project_owner_comment_approval_records(
     pull_request = int(observation["pull_request"])
     head_sha = str(observation["head_sha"])
 
-    latest_by_actor: dict[str, tuple[str, int, str, dict[str, Any]]] = {}
+    latest_by_actor: dict[str, tuple[str, int, str, dict[str, Any], str]] = {}
     for raw in observation.get("reviews", []):
         if not isinstance(raw, dict):
             continue
@@ -57,7 +61,18 @@ def project_owner_comment_approval_records(
         if not isinstance(actor, dict):
             continue
         login = str(actor.get("login") or "")
-        if role_bindings.get(login) != "project-owner":
+        actor_id = f"github:{login}"
+        role = role_bindings.get(login)
+        if identity_bindings is not None:
+            binding = identity_bindings.get(login)
+            if not isinstance(binding, dict):
+                continue
+            observed_actor_id = f"github-user:{int(actor['id'])}"
+            if observed_actor_id != str(binding.get("actor_id") or ""):
+                continue
+            role = str(binding.get("role") or "")
+            actor_id = observed_actor_id
+        if role != "project-owner":
             continue
 
         body = str(raw.get("body") or "").strip()
@@ -70,13 +85,15 @@ def project_owner_comment_approval_records(
         review_id = int(raw["id"])
         submitted_at = str(raw.get("submitted_at") or "")
         decision = match.group(3)
-        candidate = (submitted_at, review_id, decision, raw)
-        current = latest_by_actor.get(login)
+        candidate = (submitted_at, review_id, decision, raw, actor_id)
+        current = latest_by_actor.get(actor_id)
         if current is None or candidate[:2] > current[:2]:
-            latest_by_actor[login] = candidate
+            latest_by_actor[actor_id] = candidate
 
     results: list[dict[str, Any]] = []
-    for login, (submitted_at, review_id, decision, raw) in sorted(latest_by_actor.items()):
+    for actor_id, (submitted_at, review_id, decision, raw, _) in sorted(
+        latest_by_actor.items()
+    ):
         if decision != "approved":
             continue
         results.append(
@@ -88,7 +105,7 @@ def project_owner_comment_approval_records(
                 "decision": "approved",
                 "actor": {
                     "provider": "github",
-                    "id": f"github:{login}",
+                    "id": actor_id,
                     "role": "project-owner",
                 },
                 "subject": {

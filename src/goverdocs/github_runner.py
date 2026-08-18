@@ -78,6 +78,7 @@ def _generated_github_records(
     preliminary_report: dict[str, Any],
     *,
     role_bindings: dict[str, str],
+    identity_bindings: dict[str, dict[str, str]] | None,
     verified_at: str,
     include_project_owner_comment_approval: bool,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -114,6 +115,7 @@ def _generated_github_records(
                 approval_type=event or rule_id,
                 change_digest=raw_change_digest,
                 role_bindings=role_bindings,
+                identity_bindings=identity_bindings,
                 verified_at=verified_at,
             )
             if include_project_owner_comment_approval:
@@ -124,6 +126,7 @@ def _generated_github_records(
                         approval_type=event or rule_id,
                         change_digest=raw_change_digest,
                         role_bindings=role_bindings,
+                        identity_bindings=identity_bindings,
                         verified_at=verified_at,
                     )
                 )
@@ -144,6 +147,7 @@ def run_github_pr_governance(
     pull_request: int,
     as_of: date,
     role_bindings: dict[str, str] | None = None,
+    identity_bindings: dict[str, dict[str, str]] | None = None,
     evidence_items: list[dict[str, Any]] | None = None,
     approvals: list[dict[str, Any]] | None = None,
     trusted_verifiers: set[str] | None = None,
@@ -191,6 +195,7 @@ def run_github_pr_governance(
         observation,
         preliminary,
         role_bindings=role_bindings,
+        identity_bindings=identity_bindings,
         verified_at=verification_time,
         include_project_owner_comment_approval=trust_project_owner_comment_approval,
     )

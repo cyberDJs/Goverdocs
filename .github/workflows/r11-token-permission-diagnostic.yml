@@ -1,18 +1,134 @@
-name: r11-token-permission-diagnostic
+name: r11-neutral-proof-author-one-shot
 
 on:
   pull_request:
+    types: [synchronize]
 
 permissions:
   contents: write
   pull-requests: write
-  statuses: write
 
 jobs:
-  diagnostic:
-    name: token permissions diagnostic
+  author-proof:
+    name: author neutral R11 critical proof
+    if: >-
+      github.repository == 'nulleimy/OATHDO' &&
+      github.event.pull_request.number == 44 &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'proof/r11-positive-author-kick' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.title == 'chore(governance): kick R11 neutral proof author'
     runs-on: ubuntu-latest
+
     steps:
-      - name: No-op diagnostic
+      - name: Checkout canonical main only
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Create neutral bot-authored proof PR
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
-        run: echo 'R11_TOKEN_PERMISSION_DIAGNOSTIC=RUNNING'
+        run: |
+          set -euo pipefail
+
+          branch='proof/r11-positive-live-quorum'
+          proof='docs/governance/R11-POSITIVE-LIVE-QUORUM-PROOF.md'
+
+          existing_pr="$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --head "$branch" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')"
+          if [ -n "$existing_pr" ]; then
+            echo "R11_PROOF_PR_ALREADY_OPEN=$existing_pr"
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$branch" >/dev/null 2>&1; then
+            echo "R11_PROOF_BRANCH_ALREADY_EXISTS_WITHOUT_OPEN_PR=$branch" >&2
+            exit 2
+          fi
+
+          git switch -c "$branch"
+
+          cat > "$proof" <<'EOF'
+          ---
+          id: GOV-0010
+          type: governance
+          title: R11 Positive Live Quorum Proof
+          status: active
+          owner: OATHDO
+          created: 2026-08-18
+          updated: 2026-08-18
+          version: 1.0.0
+          canonical: true
+          managed_by: mixed
+          write_policy: approval-required
+          supersedes: null
+          superseded_by: null
+          related:
+            - GOV-0005
+            - GOV-0008
+          source_refs:
+            - GH-ISSUE-35
+          last_verified: null
+          review_due: null
+          ---
+
+          # OATHDO R11 — Positive Live Quorum Proof
+
+          This document exists only to create the final live `governance_change` / critical obligation for R11 verification.
+
+          The proof succeeds only when the pull request is authored by a neutral non-authority GitHub actor, `nulleimy` supplies a VERIFIED exact-head `project-owner` approval, `setarchitect` supplies a VERIFIED exact-head `independent-reviewer` approval, the required `GOVERDOCS Governance Gate` becomes non-blocking for the critical obligation, and GitHub accepts the exact-head merge server-side.
+
+          The proof must not weaken the authority policy, ruleset, required check, exact-head semantics, revocation semantics, or anti-self-approval rule.
+          EOF
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$proof"
+          git commit -m 'test(governance): prove R11 positive live quorum'
+          git push origin "HEAD:refs/heads/$branch"
+
+          head_sha="$(git rev-parse HEAD)"
+
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head "$branch" \
+            --title 'test(governance): prove R11 positive live quorum' \
+            --body "## Purpose
+
+Final OATHDO R11 positive live quorum acceptance probe for #35.
+
+## Exact subject
+
+- head: \`$head_sha\`
+- author must remain the neutral GitHub Actions actor
+- critical event: \`governance_change\`
+
+## Required authority
+
+- \`nulleimy\` → \`project-owner\` exact-head approval
+- \`setarchitect\` → \`independent-reviewer\` exact-head approval
+- both must be distinct non-author actors
+
+@setarchitect: submit the exact independent-reviewer marker supplied by the project owner. Do not alter the PR head.
+
+## Acceptance
+
+1. R10 exact-subject verification accepts both current-head markers.
+2. R11 observes two distinct eligible actors and two distinct roles.
+3. Required critical capabilities are satisfied.
+4. \`GOVERDOCS Governance Gate\` becomes non-blocking for the critical obligation.
+5. GitHub accepts exact-head merge server-side.
+6. No ruleset or policy weakening occurs.
+
+Tracks #35."
+
+          echo "R11_PROOF_HEAD=$head_sha"

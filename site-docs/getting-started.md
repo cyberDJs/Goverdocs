@@ -9,10 +9,14 @@
 ## Instalace
 
 ```bash
-git clone https://github.com/nulleimy/Goverdocs.git
-cd Goverdocs
+git clone https://github.com/nulleimy/OATHDO.git
+cd OATHDO
 ./scripts/bootstrap_local.sh
 ```
+
+## CLI kompatibilita
+
+Produktový a repozitářový název je **OATHDO**. Python package a CLI v aktuální kompatibilní řadě stále používají jméno `goverdocs`.
 
 ## První kontrola
 
@@ -39,5 +43,4 @@ python -m pip install -e '.[docs]'
 mkdocs build --strict
 ```
 
-Výstup vznikne v ignorovaném adresáři `site/`. Publikace je samostatná,
-explicitně schvalovaná operace a v tomto integračním kroku není nastavena.
+Výstup vznikne v ignorovaném adresáři `site/`. Publikace je samostatná, explicitně schvalovaná operace.

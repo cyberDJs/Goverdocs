@@ -2,7 +2,7 @@ name: r11-post-merge-verification
 
 on:
   pull_request:
-    types: [reopened]
+    types: [reopened, synchronize]
 
 permissions:
   actions: read

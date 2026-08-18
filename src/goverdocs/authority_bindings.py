@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,9 @@ import yaml
 
 class AuthorityBindingError(ValueError):
     pass
+
+
+_GITHUB_USER_ACTOR_ID = re.compile(r"^github-user:([1-9][0-9]*)$")
 
 
 def _non_empty_string(value: object, *, field: str) -> str:
@@ -63,7 +67,8 @@ def load_authority_bindings(
 
     normalized: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
-    active_actor_roles: dict[str, str] = {}
+    active_logins: dict[str, str] = {}
+    active_actor_ids: dict[str, str] = {}
     statuses = {"active", "suspended", "revoked"}
 
     for index, raw_binding in enumerate(raw_bindings):
@@ -78,9 +83,9 @@ def load_authority_bindings(
 
         login = _non_empty_string(raw_binding.get("login"), field=f"{prefix}.login")
         actor_id = _non_empty_string(raw_binding.get("actor_id"), field=f"{prefix}.actor_id")
-        if actor_id != f"github:{login}":
+        if _GITHUB_USER_ACTOR_ID.fullmatch(actor_id) is None:
             raise AuthorityBindingError(
-                f"{prefix}.actor_id must equal github:<login> for the configured login"
+                f"{prefix}.actor_id must use immutable github-user:<numeric-id> format"
             )
 
         role = _non_empty_string(raw_binding.get("role"), field=f"{prefix}.role")
@@ -116,13 +121,20 @@ def load_authority_bindings(
                 raise AuthorityBindingError(
                     f"{prefix} active binding must not declare suspended_on or revoked_on"
                 )
-            if login in active_actor_roles:
-                previous_role = active_actor_roles[login]
+            if login in active_logins:
+                previous_role = active_logins[login]
                 raise AuthorityBindingError(
-                    "authority actor has multiple active bindings: "
+                    "authority login has multiple active bindings: "
                     f"{login} ({previous_role}, {role})"
                 )
-            active_actor_roles[login] = role
+            if actor_id in active_actor_ids:
+                previous_login = active_actor_ids[actor_id]
+                raise AuthorityBindingError(
+                    "immutable authority actor has multiple active bindings: "
+                    f"{actor_id} ({previous_login}, {login})"
+                )
+            active_logins[login] = role
+            active_actor_ids[actor_id] = login
         elif status == "suspended":
             normalized_binding["suspended_on"] = _iso_date(
                 raw_binding.get("suspended_on"),
@@ -159,22 +171,38 @@ def load_authority_bindings(
     }
 
 
-def active_role_bindings(registry: dict[str, Any]) -> dict[str, str]:
+def active_identity_bindings(registry: dict[str, Any]) -> dict[str, dict[str, str]]:
     raw_bindings = registry.get("bindings")
     if not isinstance(raw_bindings, list):
         raise AuthorityBindingError("normalized authority binding registry is invalid")
 
-    active: dict[str, str] = {}
+    active: dict[str, dict[str, str]] = {}
+    actor_ids: set[str] = set()
     for item in raw_bindings:
         if not isinstance(item, dict) or item.get("status") != "active":
             continue
         login = str(item.get("login") or "")
         role = str(item.get("role") or "")
-        if not login or not role:
-            raise AuthorityBindingError("active authority binding is missing login or role")
+        actor_id = str(item.get("actor_id") or "")
+        if not login or not role or not actor_id:
+            raise AuthorityBindingError(
+                "active authority binding is missing login, role or actor_id"
+            )
         if login in active:
-            raise AuthorityBindingError(f"authority actor has multiple active bindings: {login}")
-        active[login] = role
+            raise AuthorityBindingError(f"authority login has multiple active bindings: {login}")
+        if actor_id in actor_ids:
+            raise AuthorityBindingError(
+                f"immutable authority actor has multiple active bindings: {actor_id}"
+            )
+        actor_ids.add(actor_id)
+        active[login] = {"actor_id": actor_id, "role": role}
     if not active:
         raise AuthorityBindingError("authority binding registry has no active bindings")
     return dict(sorted(active.items()))
+
+
+def active_role_bindings(registry: dict[str, Any]) -> dict[str, str]:
+    return {
+        login: binding["role"]
+        for login, binding in active_identity_bindings(registry).items()
+    }

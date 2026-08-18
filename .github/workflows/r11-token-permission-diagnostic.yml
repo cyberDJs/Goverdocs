@@ -32,3 +32,29 @@ jobs:
             --ref main \
             -f pull_request=50
           echo "DISPATCHED_GOVERNANCE_PR=50"
+
+      - name: Observe dispatched governance gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            row="$(gh run list \
+              --repo "$GITHUB_REPOSITORY" \
+              --workflow governance-gate.yml \
+              --event workflow_dispatch \
+              --limit 1 \
+              --json databaseId,status,conclusion,headSha,createdAt \
+              --jq '.[0] | [.databaseId,.status,(.conclusion // ""),.headSha,.createdAt] | @tsv')"
+            echo "GOVERNANCE_DISPATCH_OBSERVED=$row"
+            run_id="$(printf '%s' "$row" | cut -f1)"
+            status="$(printf '%s' "$row" | cut -f2)"
+            if [ -n "$run_id" ] && [ "$status" = "completed" ]; then
+              gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --log
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "governance dispatch did not complete in observation window" >&2
+          exit 2

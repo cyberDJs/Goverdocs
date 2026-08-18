@@ -20,7 +20,7 @@ permissions:
 jobs:
   governance:
     name: governance gate publisher
-    if: github.event.pull_request.draft == false
+    if: github.event_name != 'workflow_dispatch' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     steps:

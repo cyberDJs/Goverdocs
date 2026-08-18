@@ -1,11 +1,8 @@
 name: r11-positive-proof-author
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/r11-positive-proof-author.yml
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: write
@@ -19,7 +16,11 @@ concurrency:
 jobs:
   author-proof:
     name: author neutral R11 critical proof
-    if: github.repository_owner == 'nulleimy'
+    if: >-
+      github.repository_owner == 'nulleimy' &&
+      github.event.issue.number == 35 &&
+      github.actor == 'nulleimy' &&
+      github.event.comment.body == 'GOVERDOCS-R11-POSITIVE-PROOF-AUTHOR-KICK'
     runs-on: ubuntu-latest
 
     steps:
@@ -37,10 +38,10 @@ jobs:
             -f description='neutral proof author running' \
             -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
-      - name: Checkout canonical main
+      - name: Checkout canonical default branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           persist-credentials: true
 
@@ -80,7 +81,7 @@ jobs:
           type: governance
           title: R11 Positive Live Quorum Proof
           status: active
-          owner: GOVERDOCS
+          owner: OATHDO
           created: 2026-08-18
           updated: 2026-08-18
           version: 1.0.0
@@ -92,14 +93,13 @@ jobs:
           related:
             - GOV-0005
             - GOV-0008
-            - GOV-0009
           source_refs:
             - GH-ISSUE-35
           last_verified: null
           review_due: null
           ---
 
-          # R11 — Positive Live Quorum Proof
+          # OATHDO R11 — Positive Live Quorum Proof
 
           This document exists only to create the final live `governance_change` / critical obligation for R11 verification.
 
@@ -123,7 +123,7 @@ jobs:
             --title 'test(governance): prove R11 positive live quorum' \
             --body "## Purpose
 
-Final R11 positive live quorum acceptance probe for #35.
+Final OATHDO R11 positive live quorum acceptance probe for #35.
 
 ## Exact subject
 
@@ -136,6 +136,8 @@ Final R11 positive live quorum acceptance probe for #35.
 - \`nulleimy\` → \`project-owner\` exact-head approval
 - \`setarchitect\` → \`independent-reviewer\` exact-head approval
 - both must be distinct non-author actors
+
+@setarchitect: after the PR exists, submit the exact independent-reviewer marker shown in the owner follow-up comment. Do not alter the PR head.
 
 ## Acceptance
 

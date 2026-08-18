@@ -1,0 +1,10 @@
+{
+  "id": "R12-AUTHORITY-REGISTRY-LIVE-PROOF",
+  "purpose": "Create a bounded high-severity cicd_change subject that requires project-owner authority after R12.0 canonicalization.",
+  "authority_source": "policies/AUTHORITY_BINDINGS.yaml",
+  "required_actor": "github:nulleimy",
+  "required_role": "project-owner",
+  "expected_gate": "GOVERDOCS Governance Gate",
+  "runtime_effect": "none",
+  "tracks": "GH-ISSUE-53"
+}

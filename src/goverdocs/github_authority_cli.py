@@ -9,6 +9,11 @@ from datetime import date
 from pathlib import Path
 
 from .authority import AuthorityPolicyError, apply_authority_policy, load_authority_policy
+from .authority_bindings import (
+    AuthorityBindingError,
+    active_role_bindings,
+    load_authority_bindings,
+)
 from .config import load_config
 from .evidence import load_json_records, validate_record
 from .github_check import (
@@ -42,7 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="goverdocs-github-authority-run",
         description=(
-            "Compose canonical GitHub governance evaluation, then apply R11 "
+            "Compose canonical GitHub governance evaluation, then apply R11/R12 "
             "multi-actor authority before publishing the required check"
         ),
     )
@@ -51,6 +56,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--authority-policy",
         default="policies/AUTHORITY_POLICY.yaml",
         help="R11 authority policy path, relative to --root unless absolute",
+    )
+    parser.add_argument(
+        "--authority-bindings",
+        help=(
+            "R12 canonical authority binding registry path, relative to --root unless "
+            "absolute; cannot be combined with --role-binding"
+        ),
     )
     parser.add_argument(
         "--repository",
@@ -139,18 +151,31 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not policy_path.is_absolute():
             policy_path = root / policy_path
         authority_policy = load_authority_policy(policy_path)
-
-        role_bindings = dict(args.role_binding)
-        if len(role_bindings) != len(args.role_binding):
-            raise ValueError("duplicate GitHub role binding login")
-
         configured_roles = set(authority_policy["roles"])
-        unknown_roles = sorted(set(role_bindings.values()) - configured_roles)
-        if unknown_roles:
-            raise AuthorityPolicyError(
-                "GitHub role binding references roles absent from authority policy: "
-                + ", ".join(unknown_roles)
+
+        if args.authority_bindings and args.role_binding:
+            raise AuthorityBindingError(
+                "--authority-bindings cannot be combined with --role-binding"
             )
+        if args.authority_bindings:
+            bindings_path = Path(args.authority_bindings).expanduser()
+            if not bindings_path.is_absolute():
+                bindings_path = root / bindings_path
+            registry = load_authority_bindings(
+                bindings_path,
+                known_roles=configured_roles,
+            )
+            role_bindings = active_role_bindings(registry)
+        else:
+            role_bindings = dict(args.role_binding)
+            if len(role_bindings) != len(args.role_binding):
+                raise ValueError("duplicate GitHub role binding login")
+            unknown_roles = sorted(set(role_bindings.values()) - configured_roles)
+            if unknown_roles:
+                raise AuthorityPolicyError(
+                    "GitHub role binding references roles absent from authority policy: "
+                    + ", ".join(unknown_roles)
+                )
 
         config = load_config(root)
         reader = GitHubRESTClient.from_env(
@@ -256,6 +281,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1 if report["status"] == "BLOCKED" else 0
     except (
         FileNotFoundError,
+        AuthorityBindingError,
         AuthorityPolicyError,
         GitHubGovernanceRunError,
         RuntimeError,

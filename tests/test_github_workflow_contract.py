@@ -10,7 +10,9 @@ def test_governance_workflow_never_executes_pull_request_head_code() -> None:
     assert "github.event.pull_request.head.sha" not in text
     assert "--trust-github-verifier" in text
     assert "--trust-pr-evidence-contract" in text
-    assert '--role-binding "nulleimy=project-owner"' in text
+    assert "--authority-bindings policies/AUTHORITY_BINDINGS.yaml" in text
+    assert "nulleimy=project-owner" not in text
+    assert "setarchitect=independent-reviewer" not in text
     assert "python -m goverdocs.github_authority_cli" in text
     assert "--authority-policy policies/AUTHORITY_POLICY.yaml" in text
 

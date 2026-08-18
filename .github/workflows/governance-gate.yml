@@ -54,12 +54,11 @@ jobs:
           python -m goverdocs.github_authority_cli \
             --root . \
             --authority-policy policies/AUTHORITY_POLICY.yaml \
+            --authority-bindings policies/AUTHORITY_BINDINGS.yaml \
             --repository "$GITHUB_REPOSITORY" \
             --pull-request "$PR_NUMBER" \
             --as-of "$as_of" \
             --verified-at "${as_of}T23:59:59Z" \
-            --role-binding "nulleimy=project-owner" \
-            --role-binding "setarchitect=independent-reviewer" \
             --trust-github-verifier \
             --trust-pr-evidence-contract \
             --trust-project-owner-comment-approval \
@@ -157,12 +156,11 @@ jobs:
           python -m goverdocs.github_authority_cli \
             --root . \
             --authority-policy policies/AUTHORITY_POLICY.yaml \
+            --authority-bindings policies/AUTHORITY_BINDINGS.yaml \
             --repository "$GITHUB_REPOSITORY" \
             --pull-request "$PR_NUMBER" \
             --as-of "$as_of" \
             --verified-at "${as_of}T23:59:59Z" \
-            --role-binding "nulleimy=project-owner" \
-            --role-binding "setarchitect=independent-reviewer" \
             --trust-github-verifier \
             --trust-pr-evidence-contract \
             --trust-project-owner-comment-approval \

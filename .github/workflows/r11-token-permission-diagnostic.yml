@@ -22,39 +22,34 @@ jobs:
 
     steps:
       - name: Dispatch canonical governance gate for PR 50
+        id: dispatch
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run governance-gate.yml \
+          run_url="$(gh workflow run governance-gate.yml \
             --repo "$GITHUB_REPOSITORY" \
             --ref main \
-            -f pull_request=50
+            -f pull_request=50)"
+          run_id="${run_url##*/}"
+          case "$run_id" in
+            ''|*[!0-9]*)
+              echo "invalid dispatch run id from url: $run_url" >&2
+              exit 2
+              ;;
+          esac
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
           echo "DISPATCHED_GOVERNANCE_PR=50"
+          echo "DISPATCHED_RUN_ID=$run_id"
 
-      - name: Observe dispatched governance gate
+      - name: Observe exact dispatched governance gate
         env:
           GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 30); do
-            row="$(gh run list \
-              --repo "$GITHUB_REPOSITORY" \
-              --workflow governance-gate.yml \
-              --event workflow_dispatch \
-              --limit 1 \
-              --json databaseId,status,conclusion,headSha,createdAt \
-              --jq '.[0] | [.databaseId,.status,(.conclusion // ""),.headSha,.createdAt] | @tsv')"
-            echo "GOVERNANCE_DISPATCH_OBSERVED=$row"
-            run_id="$(printf '%s' "$row" | cut -f1)"
-            status="$(printf '%s' "$row" | cut -f2)"
-            if [ -n "$run_id" ] && [ "$status" = "completed" ]; then
-              gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --log
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "governance dispatch did not complete in observation window" >&2
-          exit 2
+          gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status || rc=$?
+          gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --log
+          exit "${rc:-0}"

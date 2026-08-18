@@ -6,6 +6,7 @@ on:
 
 permissions:
   actions: write
+  checks: read
   contents: read
 
 jobs:
@@ -52,4 +53,23 @@ jobs:
           set -euo pipefail
           gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status || rc=$?
           gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --log
-          exit "${rc:-0}"
+          echo "DISPATCH_RUN_RC=${rc:-0}"
+
+      - name: Inspect exact proof check runs and ruleset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          head_sha="$(gh api "repos/$GITHUB_REPOSITORY/pulls/50" --jq '.head.sha')"
+          echo "PROOF_HEAD=$head_sha"
+          echo "=== CHECK RUNS ==="
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "repos/$GITHUB_REPOSITORY/commits/$head_sha/check-runs" \
+            --jq '.check_runs[] | {id,name,status,conclusion,head_sha,external_id,app_id:.app.id,app_slug:.app.slug}'
+          echo "=== RULESET 20928616 ==="
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "repos/$GITHUB_REPOSITORY/rulesets/20928616" \
+            --jq '{id,name,enforcement,rules}'

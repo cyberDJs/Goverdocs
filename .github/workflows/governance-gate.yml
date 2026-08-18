@@ -53,6 +53,7 @@ jobs:
             --as-of "$as_of" \
             --verified-at "${as_of}T23:59:59Z" \
             --role-binding "nulleimy=project-owner" \
+            --role-binding "setarchitect=independent-reviewer" \
             --trust-github-verifier \
             --trust-pr-evidence-contract \
             --trust-project-owner-comment-approval \

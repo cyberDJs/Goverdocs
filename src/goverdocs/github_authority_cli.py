@@ -11,6 +11,7 @@ from pathlib import Path
 from .authority import AuthorityPolicyError, apply_authority_policy, load_authority_policy
 from .authority_bindings import (
     AuthorityBindingError,
+    active_github_user_id_bindings,
     active_role_bindings,
     load_authority_bindings,
 )
@@ -153,6 +154,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         authority_policy = load_authority_policy(policy_path)
         configured_roles = set(authority_policy["roles"])
 
+        actor_id_bindings: dict[str, int] | None = None
         if args.authority_bindings and args.role_binding:
             raise AuthorityBindingError(
                 "--authority-bindings cannot be combined with --role-binding"
@@ -166,6 +168,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 known_roles=configured_roles,
             )
             role_bindings = active_role_bindings(registry)
+            actor_id_bindings = active_github_user_id_bindings(registry)
         else:
             role_bindings = dict(args.role_binding)
             if len(role_bindings) != len(args.role_binding):
@@ -191,6 +194,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             pull_request=args.pull_request,
             as_of=date.fromisoformat(args.as_of),
             role_bindings=role_bindings,
+            actor_id_bindings=actor_id_bindings,
             evidence_items=load_json_records(args.evidence_file),
             approvals=load_json_records(args.approval_file),
             trusted_verifiers=set(args.trusted_verifier),
@@ -228,9 +232,23 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "GitHub pull observation is missing author"
             )
         author_login = str(author.get("login") or "")
+        change_author_id = None
+        if actor_id_bindings is not None:
+            raw_author_id = author.get("id")
+            if (
+                not isinstance(raw_author_id, int)
+                or isinstance(raw_author_id, bool)
+                or raw_author_id < 1
+            ):
+                raise GitHubGovernanceRunError(
+                    "GitHub pull observation has invalid immutable author id"
+                )
+            change_author_id = f"github-user:{raw_author_id}"
+
         report = apply_authority_policy(
             base_result["gate_report"],
             change_author=author_login,
+            change_author_id=change_author_id,
             policy=authority_policy,
         )
         payload = build_check_run_payload(

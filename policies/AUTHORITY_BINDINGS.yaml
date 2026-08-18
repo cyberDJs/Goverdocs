@@ -1,25 +1,46 @@
-version: 1
+version: 2
 provider: github
 recovery:
   preserve_history: true
   replacement_requires_new_binding_id: true
+  explicit_lifecycle_required: true
+  revoked_bindings_terminal: true
+  initial_enrollment_closed_on: "2026-08-18"
+  initial_binding_ids:
+    - BIND-GH-NULLEIMY-OWNER-001
+    - BIND-GH-SETARCHITECT-INDEPENDENT-001
 bindings:
   - id: BIND-GH-NULLEIMY-OWNER-001
     actor_id: github-user:268458602
     login: nulleimy
     role: project-owner
+    origin: initial
     status: active
     enrolled_on: "2026-08-17"
     evidence_refs:
       - GH-ISSUE-35
       - GH-ISSUE-58
+    lifecycle:
+      - event: enrolled
+        on: "2026-08-17"
+        evidence_refs:
+          - GH-ISSUE-35
+          - GH-ISSUE-58
   - id: BIND-GH-SETARCHITECT-INDEPENDENT-001
     actor_id: github-user:264658998
     login: setarchitect
     role: independent-reviewer
+    origin: initial
     status: active
     enrolled_on: "2026-08-18"
     evidence_refs:
       - GH-PR-38
       - GH-PR-50
       - GH-ISSUE-58
+    lifecycle:
+      - event: enrolled
+        on: "2026-08-18"
+        evidence_refs:
+          - GH-PR-38
+          - GH-PR-50
+          - GH-ISSUE-58

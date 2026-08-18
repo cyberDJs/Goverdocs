@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "goverdocs"
 version = "0.1.0"
-description = "Deterministic documentation governance kernel for human and AI-operated projects"
+description = "OATHDO — deterministic documentation governance kernel for human and AI-operated projects"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
@@ -44,9 +44,9 @@ compliance = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cyberDJs/Goverdocs"
-Repository = "https://github.com/cyberDJs/Goverdocs"
-Issues = "https://github.com/cyberDJs/Goverdocs/issues"
+Homepage = "https://github.com/nulleimy/OATHDO"
+Repository = "https://github.com/nulleimy/OATHDO"
+Issues = "https://github.com/nulleimy/OATHDO/issues"
 
 [project.scripts]
 goverdocs = "goverdocs.cli:main"

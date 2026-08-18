@@ -1,75 +1,45 @@
-name: r11-governance-dispatch-kick
+name: r11-post-merge-verification
 
 on:
   pull_request:
-    types: [reopened, synchronize]
+    types: [reopened]
 
 permissions:
-  actions: write
+  actions: read
   checks: read
   contents: read
 
 jobs:
-  dispatch-governance:
-    name: dispatch canonical governance reevaluation
+  verify-post-merge:
+    name: verify R11 post-merge canonical state
     if: >-
       github.repository == 'nulleimy/OATHDO' &&
       github.event.pull_request.number == 44 &&
       github.event.pull_request.base.ref == 'main' &&
       github.event.pull_request.head.ref == 'proof/r11-positive-author-kick' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.title == 'chore(governance): kick R11 neutral proof author'
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-
     steps:
-      - name: Dispatch canonical governance gate for PR 50
-        id: dispatch
+      - name: Inspect exact merge SHA checks and workflow runs
         env:
           GH_TOKEN: ${{ github.token }}
+          MERGE_SHA: b6d47531b53d571a24b235d686b836656c36c071
         shell: bash
         run: |
           set -euo pipefail
-          run_url="$(gh workflow run governance-gate.yml \
-            --repo "$GITHUB_REPOSITORY" \
-            --ref main \
-            -f pull_request=50)"
-          run_id="${run_url##*/}"
-          case "$run_id" in
-            ''|*[!0-9]*)
-              echo "invalid dispatch run id from url: $run_url" >&2
-              exit 2
-              ;;
-          esac
-          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
-          echo "DISPATCHED_GOVERNANCE_PR=50"
-          echo "DISPATCHED_RUN_ID=$run_id"
+          current_main="$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')"
+          echo "CURRENT_MAIN=$current_main"
+          test "$current_main" = "$MERGE_SHA"
 
-      - name: Observe exact dispatched governance gate
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status || rc=$?
-          gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --log
-          echo "DISPATCH_RUN_RC=${rc:-0}"
-
-      - name: Inspect exact proof check runs and ruleset
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          head_sha="$(gh api "repos/$GITHUB_REPOSITORY/pulls/50" --jq '.head.sha')"
-          echo "PROOF_HEAD=$head_sha"
-          echo "=== CHECK RUNS ==="
+          echo "=== POST-MERGE CHECK RUNS ==="
           gh api \
             -H 'Accept: application/vnd.github+json' \
-            "repos/$GITHUB_REPOSITORY/commits/$head_sha/check-runs" \
-            --jq '.check_runs[] | {id,name,status,conclusion,head_sha,external_id,app_id:.app.id,app_slug:.app.slug}'
-          echo "=== RULESET 20928616 ==="
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
-            "repos/$GITHUB_REPOSITORY/rulesets/20928616" \
-            --jq '{id,name,enforcement,rules}'
+            "repos/$GITHUB_REPOSITORY/commits/$MERGE_SHA/check-runs" \
+            --jq '.check_runs[] | {id,name,status,conclusion,head_sha,app_id:.app.id,app_slug:.app.slug}'
+
+          echo "=== POST-MERGE WORKFLOW RUNS ==="
+          gh api --method GET \
+            "repos/$GITHUB_REPOSITORY/actions/runs" \
+            -f head_sha="$MERGE_SHA" \
+            -f per_page=100 \
+            --jq '.workflow_runs[] | {id,name,event,status,conclusion,head_sha}'

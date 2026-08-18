@@ -4,8 +4,8 @@ import pytest
 import yaml
 
 from goverdocs.authority_bindings import (
-    AuthorityBindingError,
     active_role_bindings,
+    AuthorityBindingError,
     load_authority_bindings,
 )
 

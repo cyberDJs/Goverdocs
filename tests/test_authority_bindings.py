@@ -4,11 +4,10 @@ import pytest
 import yaml
 
 from goverdocs.authority_bindings import (
-    active_role_bindings,
     AuthorityBindingError,
+    active_role_bindings,
     load_authority_bindings,
 )
-
 
 ROLES = {"project-owner", "independent-reviewer"}
 

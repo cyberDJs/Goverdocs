@@ -3,6 +3,7 @@ set -euo pipefail
 
 branch='proof/r11-positive-live-quorum'
 proof='docs/governance/R11-POSITIVE-LIVE-QUORUM-PROOF.md'
+expected_existing_head='d29799020c77518bf08cae02384b57a726aab636'
 
 existing_pr="$(gh pr list \
   --repo "$GITHUB_REPOSITORY" \
@@ -16,15 +17,18 @@ if [ -n "$existing_pr" ]; then
 fi
 
 if git ls-remote --exit-code --heads origin "refs/heads/$branch" >/dev/null 2>&1; then
-  echo "R11_PROOF_BRANCH_ALREADY_EXISTS_WITHOUT_OPEN_PR=$branch" >&2
-  exit 2
-fi
+  git fetch origin "$branch"
+  head_sha="$(git rev-parse FETCH_HEAD)"
+  if [ "$head_sha" != "$expected_existing_head" ]; then
+    echo "R11_PROOF_BRANCH_HEAD_DRIFT expected=$expected_existing_head actual=$head_sha" >&2
+    exit 2
+  fi
+else
+  git fetch origin main
+  git switch --detach origin/main
+  git switch -c "$branch"
 
-git fetch origin main
-git switch --detach origin/main
-git switch -c "$branch"
-
-cat > "$proof" <<'EOF'
+  cat > "$proof" <<'EOF'
 ---
 id: GOV-0010
 type: governance
@@ -57,13 +61,13 @@ The proof succeeds only when the pull request is authored by a neutral non-autho
 The proof must not weaken the authority policy, ruleset, required check, exact-head semantics, revocation semantics, or anti-self-approval rule.
 EOF
 
-git config user.name 'github-actions[bot]'
-git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-git add "$proof"
-git commit -m 'test(governance): prove R11 positive live quorum'
-git push origin "HEAD:refs/heads/$branch"
-
-head_sha="$(git rev-parse HEAD)"
+  git config user.name 'github-actions[bot]'
+  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+  git add "$proof"
+  git commit -m 'test(governance): prove R11 positive live quorum'
+  git push origin "HEAD:refs/heads/$branch"
+  head_sha="$(git rev-parse HEAD)"
+fi
 
 gh pr create \
   --repo "$GITHUB_REPOSITORY" \

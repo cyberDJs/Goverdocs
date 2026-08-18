@@ -171,15 +171,22 @@ jobs:
           retention-days: 14
 
   r11-neutral-author:
-    name: R11 neutral proof author diagnostic
+    name: R11 neutral proof author
     if: github.event_name == 'pull_request' && github.event.pull_request.number == 44
     permissions:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Permission-path diagnostic
-        run: echo 'R11_NEUTRAL_AUTHOR_JOB=RUNNING'
+      - name: Checkout kick branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: true
+
+      - name: Create neutral bot-authored proof PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/r11-neutral-proof-author.sh
 
   release-v0-1-0:
     name: release / v0.1.0

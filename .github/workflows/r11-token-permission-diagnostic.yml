@@ -1,0 +1,18 @@
+name: r11-token-permission-diagnostic
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  diagnostic:
+    name: token permissions diagnostic
+    runs-on: ubuntu-latest
+    steps:
+      - name: No-op diagnostic
+        shell: bash
+        run: echo 'R11_TOKEN_PERMISSION_DIAGNOSTIC=RUNNING'

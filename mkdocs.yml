@@ -1,8 +1,8 @@
-site_name: GOVERDOCS
+site_name: OATHDO
 site_description: Deterministická governance technické dokumentace
-site_url: https://cyberdjs.github.io/Goverdocs/
-repo_url: https://github.com/cyberDJs/Goverdocs
-repo_name: cyberDJs/Goverdocs
+site_url: https://nulleimy.github.io/OATHDO/
+repo_url: https://github.com/nulleimy/OATHDO
+repo_name: nulleimy/OATHDO
 edit_uri: edit/main/site-docs/
 docs_dir: site-docs
 site_dir: site
@@ -23,13 +23,13 @@ nav:
   - Začínáme: getting-started.md
   - Governance model: governance-model.md
   - Kanonická dokumentace:
-      - Technická ústava: https://github.com/cyberDJs/Goverdocs/blob/main/WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md
-      - Ústavní rámec: https://github.com/cyberDJs/Goverdocs/blob/main/GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
-      - Produktový operating mode: https://github.com/cyberDJs/Goverdocs/blob/main/PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
-      - Změnová brána 10/10: https://github.com/cyberDJs/Goverdocs/blob/main/policies/CHANGE_GATE_10_OF_10.yaml
-      - Dokumentační index: https://github.com/cyberDJs/Goverdocs/blob/main/DOCUMENTATION_INDEX.md
-      - Projektový stav: https://github.com/cyberDJs/Goverdocs/blob/main/PROJECT_STATE.md
-      - Automatizační governance: https://github.com/cyberDJs/Goverdocs/blob/main/docs/governance/GOV-DOCUMENTATION-AUTOMATION.md
+      - Technická ústava: https://github.com/nulleimy/OATHDO/blob/main/WORLD_CLASS_SOFTWARE_DEVOPS_OPERATING_MODE.md
+      - Ústavní rámec: https://github.com/nulleimy/OATHDO/blob/main/GOVERDOCS_CONSTITUTIONAL_FRAMEWORK.md
+      - Produktový operating mode: https://github.com/nulleimy/OATHDO/blob/main/PRODUCT_DECISION_EXECUTION_OPERATING_MODE.md
+      - Změnová brána 10/10: https://github.com/nulleimy/OATHDO/blob/main/policies/CHANGE_GATE_10_OF_10.yaml
+      - Dokumentační index: https://github.com/nulleimy/OATHDO/blob/main/DOCUMENTATION_INDEX.md
+      - Projektový stav: https://github.com/nulleimy/OATHDO/blob/main/PROJECT_STATE.md
+      - Automatizační governance: https://github.com/nulleimy/OATHDO/blob/main/docs/governance/GOV-DOCUMENTATION-AUTOMATION.md
 
 markdown_extensions:
   - admonition

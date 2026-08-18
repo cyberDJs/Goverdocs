@@ -1,8 +1,9 @@
 name: r11-positive-proof-author
 
 on:
-  pull_request_target:
-    types: [opened, reopened]
+  workflow_run:
+    workflows: [quality]
+    types: [completed]
 
 permissions:
   contents: write
@@ -18,14 +19,62 @@ jobs:
     name: author neutral R11 critical proof
     if: >-
       github.repository_owner == 'nulleimy' &&
-      github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.head.ref == 'proof/r11-positive-author-kick' &&
-      github.event.pull_request.title == 'chore(governance): kick R11 neutral proof author'
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate bounded kick PR
+        id: validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          expected_branch='proof/r11-positive-author-kick'
+          expected_title='chore(governance): kick R11 neutral proof author'
+
+          mapfile -t prs < <(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --head "$expected_branch" \
+            --json number \
+            --jq '.[].number')
+
+          if [ "${#prs[@]}" -ne 1 ]; then
+            echo 'eligible=false' >> "$GITHUB_OUTPUT"
+            echo "R11_KICK_PR_COUNT=${#prs[@]}"
+            exit 0
+          fi
+
+          pr="${prs[0]}"
+          payload="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr")"
+
+          title="$(jq -r '.title' <<<"$payload")"
+          state="$(jq -r '.state' <<<"$payload")"
+          base="$(jq -r '.base.ref' <<<"$payload")"
+          head="$(jq -r '.head.ref' <<<"$payload")"
+          head_repo="$(jq -r '.head.repo.full_name' <<<"$payload")"
+          head_sha="$(jq -r '.head.sha' <<<"$payload")"
+
+          if [ "$state" != 'open' ] || \
+             [ "$title" != "$expected_title" ] || \
+             [ "$base" != 'main' ] || \
+             [ "$head" != "$expected_branch" ] || \
+             [ "$head_repo" != "$GITHUB_REPOSITORY" ]; then
+            echo 'eligible=false' >> "$GITHUB_OUTPUT"
+            echo "R11_KICK_REJECTED pr=$pr state=$state base=$base head=$head head_repo=$head_repo"
+            exit 0
+          fi
+
+          echo 'eligible=true' >> "$GITHUB_OUTPUT"
+          echo "pr=$pr" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "R11_KICK_ACCEPTED pr=$pr head=$head_sha"
+
       - name: Publish pending harness status
+        if: steps.validate.outputs.eligible == 'true'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -40,6 +89,7 @@ jobs:
             -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
       - name: Checkout canonical default branch
+        if: steps.validate.outputs.eligible == 'true'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.event.repository.default_branch }}
@@ -47,6 +97,7 @@ jobs:
           persist-credentials: true
 
       - name: Create bot-authored critical proof PR
+        if: steps.validate.outputs.eligible == 'true'
         id: author
         continue-on-error: true
         env:
@@ -138,7 +189,7 @@ Final OATHDO R11 positive live quorum acceptance probe for #35.
 - \`setarchitect\` → \`independent-reviewer\` exact-head approval
 - both must be distinct non-author actors
 
-@setarchitect: after the PR exists, submit the exact independent-reviewer marker shown in the owner follow-up comment. Do not alter the PR head.
+@setarchitect: submit the exact independent-reviewer marker supplied by the project owner. Do not alter the PR head.
 
 ## Acceptance
 
@@ -154,7 +205,7 @@ Tracks #35."
           echo "R11_PROOF_HEAD=$head_sha"
 
       - name: Publish final harness status
-        if: always()
+        if: steps.validate.outputs.eligible == 'true' && always()
         env:
           GH_TOKEN: ${{ github.token }}
           AUTHOR_OUTCOME: ${{ steps.author.outcome }}

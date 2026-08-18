@@ -29,6 +29,7 @@ def project_owner_comment_approval_records(
     change_digest: str,
     role_bindings: dict[str, str],
     verified_at: str,
+    actor_id_bindings: dict[str, int] | None = None,
     valid_until: str | None = None,
 ) -> list[dict[str, Any]]:
     """Convert strict exact-head project-owner COMMENT markers into approvals.
@@ -37,6 +38,11 @@ def project_owner_comment_approval_records(
     of the machine-readable GOVERDOCS-APPROVAL-V1 marker, the actor must have
     an explicit project-owner role binding, and the marker, review commit, PR
     number, and current observation HEAD must all agree exactly.
+
+    When immutable actor bindings are supplied, both the GitHub login and the
+    numeric GitHub user id observed through the authenticated API must match
+    the canonical binding. This prevents a login alias from substituting for
+    the enrolled authority identity.
 
     Approval lifecycle is fail-closed. For each project-owner actor on the
     exact PR+HEAD, only that actor's latest valid marker is authoritative. A
@@ -60,6 +66,20 @@ def project_owner_comment_approval_records(
         if role_bindings.get(login) != "project-owner":
             continue
 
+        authority_actor_id = f"github:{login}"
+        if actor_id_bindings is not None:
+            expected_user_id = actor_id_bindings.get(login)
+            observed_user_id = actor.get("id")
+            if expected_user_id is None:
+                continue
+            if (
+                not isinstance(observed_user_id, int)
+                or isinstance(observed_user_id, bool)
+                or observed_user_id != expected_user_id
+            ):
+                continue
+            authority_actor_id = f"github-user:{expected_user_id}"
+
         body = str(raw.get("body") or "").strip()
         match = _MARKER.fullmatch(body)
         if match is None:
@@ -71,12 +91,14 @@ def project_owner_comment_approval_records(
         submitted_at = str(raw.get("submitted_at") or "")
         decision = match.group(3)
         candidate = (submitted_at, review_id, decision, raw)
-        current = latest_by_actor.get(login)
+        current = latest_by_actor.get(authority_actor_id)
         if current is None or candidate[:2] > current[:2]:
-            latest_by_actor[login] = candidate
+            latest_by_actor[authority_actor_id] = candidate
 
     results: list[dict[str, Any]] = []
-    for login, (submitted_at, review_id, decision, raw) in sorted(latest_by_actor.items()):
+    for authority_actor_id, (submitted_at, review_id, decision, raw) in sorted(
+        latest_by_actor.items()
+    ):
         if decision != "approved":
             continue
         results.append(
@@ -88,7 +110,7 @@ def project_owner_comment_approval_records(
                 "decision": "approved",
                 "actor": {
                     "provider": "github",
-                    "id": f"github:{login}",
+                    "id": authority_actor_id,
                     "role": "project-owner",
                 },
                 "subject": {

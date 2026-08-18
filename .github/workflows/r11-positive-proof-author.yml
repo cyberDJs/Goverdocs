@@ -19,7 +19,7 @@ concurrency:
 jobs:
   author-proof:
     name: author neutral R11 critical proof
-    if: github.repository == 'nulleimy/VERIRUNE'
+    if: github.repository_owner == 'nulleimy'
     runs-on: ubuntu-latest
 
     steps:

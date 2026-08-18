@@ -11,6 +11,7 @@ from pathlib import Path
 from .authority import AuthorityPolicyError, apply_authority_policy, load_authority_policy
 from .authority_bindings import (
     AuthorityBindingError,
+    active_identity_bindings,
     active_role_bindings,
     load_authority_bindings,
 )
@@ -153,6 +154,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         authority_policy = load_authority_policy(policy_path)
         configured_roles = set(authority_policy["roles"])
 
+        identity_bindings: dict[str, dict[str, str]] | None = None
         if args.authority_bindings and args.role_binding:
             raise AuthorityBindingError(
                 "--authority-bindings cannot be combined with --role-binding"
@@ -165,6 +167,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 bindings_path,
                 known_roles=configured_roles,
             )
+            identity_bindings = active_identity_bindings(registry)
             role_bindings = active_role_bindings(registry)
         else:
             role_bindings = dict(args.role_binding)
@@ -191,6 +194,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             pull_request=args.pull_request,
             as_of=date.fromisoformat(args.as_of),
             role_bindings=role_bindings,
+            identity_bindings=identity_bindings,
             evidence_items=load_json_records(args.evidence_file),
             approvals=load_json_records(args.approval_file),
             trusted_verifiers=set(args.trusted_verifier),
@@ -228,9 +232,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "GitHub pull observation is missing author"
             )
         author_login = str(author.get("login") or "")
+        author_actor_id = None
+        if identity_bindings is not None:
+            author_actor_id = f"github-user:{int(author['id'])}"
         report = apply_authority_policy(
             base_result["gate_report"],
             change_author=author_login,
+            change_author_actor_id=author_actor_id,
             policy=authority_policy,
         )
         payload = build_check_run_payload(

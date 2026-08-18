@@ -1,4 +1,4 @@
-name: r11-post-merge-verification
+name: r12-immutable-identity-gate-diagnostic
 
 on:
   pull_request:
@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  verify-post-merge:
-    name: verify R11 post-merge canonical state
+  inspect-gate:
+    name: inspect R12 immutable identity gate
     if: >-
       github.repository == 'nulleimy/OATHDO' &&
       github.event.pull_request.number == 44 &&
@@ -20,26 +20,29 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect exact merge SHA checks and workflow runs
+      - name: Inspect exact R12.1 proof gate and producer run
         env:
           GH_TOKEN: ${{ github.token }}
-          MERGE_SHA: adbc1a0100deecad96609ae9639afd063e006cf0
+          PROOF_SHA: 89cf1fdce6eafbfd2e37985db8ab0cf01bb4a3e9
         shell: bash
         run: |
           set -euo pipefail
-          current_main="$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')"
-          echo "CURRENT_MAIN=$current_main"
-          test "$current_main" = "$MERGE_SHA"
+          echo "PROOF_SHA=$PROOF_SHA"
 
-          echo "=== POST-MERGE CHECK RUNS ==="
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
-            "repos/$GITHUB_REPOSITORY/commits/$MERGE_SHA/check-runs" \
-            --jq '.check_runs[] | {id,name,status,conclusion,head_sha,app_id:.app.id,app_slug:.app.slug}'
+          checks="$(gh api -H 'Accept: application/vnd.github+json' \
+            "repos/$GITHUB_REPOSITORY/commits/$PROOF_SHA/check-runs")"
 
-          echo "=== POST-MERGE WORKFLOW RUNS ==="
-          gh api --method GET \
-            "repos/$GITHUB_REPOSITORY/actions/runs" \
-            -f head_sha="$MERGE_SHA" \
-            -f per_page=100 \
-            --jq '.workflow_runs[] | {id,name,event,status,conclusion,head_sha}'
+          echo '=== GOVERNANCE CHECK ==='
+          jq -c '.check_runs[] | select(.name == "GOVERDOCS Governance Gate") | {id,name,status,conclusion,head_sha,details_url,output,app:{id:.app.id,slug:.app.slug}}' <<<"$checks"
+
+          details_url="$(jq -r '.check_runs[] | select(.name == "GOVERDOCS Governance Gate") | .details_url // empty' <<<"$checks" | tail -n 1)"
+          test -n "$details_url"
+          run_id="$(sed -nE 's#.*actions/runs/([0-9]+).*#\1#p' <<<"$details_url")"
+          echo "GOVERNANCE_RUN_ID=$run_id"
+          test -n "$run_id"
+
+          echo '=== GOVERNANCE RUN ==='
+          gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --json name,event,status,conclusion,headSha,url
+
+          echo '=== GOVERNANCE RUN LOG ==='
+          gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --log

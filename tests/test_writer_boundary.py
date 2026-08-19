@@ -2,8 +2,8 @@ import copy
 import json
 from pathlib import Path
 
-import pytest
 from jsonschema import Draft202012Validator
+import pytest
 
 from goverdocs.writer_boundary import (
     WriteGrantError,

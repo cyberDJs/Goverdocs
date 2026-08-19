@@ -1,0 +1,6 @@
+{
+  "id": "R13.0-WRITE-GRANT-LIVE-PROBE",
+  "runtime_effect": "none",
+  "writer_capability": "none",
+  "tracks": ["GH-ISSUE-67"]
+}

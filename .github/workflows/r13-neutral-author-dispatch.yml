@@ -1,0 +1,50 @@
+name: r13-neutral-author-dispatch
+
+on:
+  push:
+    branches:
+      - chore/r13-neutral-author-dispatch
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-neutral-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create neutral-author R13.1 PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api \
+            --method POST \
+            "repos/$GITHUB_REPOSITORY/pulls" \
+            -f title='feat(writer): add grant-bound local workspace executor' \
+            -f head='feat/r13-local-writer-executor-r1' \
+            -f base='main' \
+            -f body='## Purpose
+
+Neutral-author replacement for closed PR #71. Implements R13.1 under #70 / #67 using the exact existing implementation branch and code; only the PR author topology changes so the critical R11 authority profile can be satisfied without counting the change author.
+
+## Safety boundary
+
+- local/sandbox executor only;
+- no GitHub writer adapter;
+- no direct-main path;
+- no merge bypass;
+- no authority/ruleset/required-check changes;
+- exact existing implementation HEAD must remain unchanged before authority review.
+
+## Acceptance
+
+- project-owner exact-head marker from nulleimy;
+- independent-reviewer exact-head approval from setarchitect;
+- Quality + CodeQL success;
+- GOVERDOCS Governance Gate non-blocking;
+- exact-head server merge through existing protection;
+- post-merge live probe before R13.1 is marked VERIFIED LIVE.
+
+Tracks #70 and #67.'

@@ -1,0 +1,90 @@
+name: r13-neutral-author-once
+
+on:
+  push:
+    branches:
+      - main
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  create-neutral-r13-pr:
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.number == 70 &&
+       github.event.comment.body == '/r13-neutral-author')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create neutral-author R13.1 PR only while implementation is ahead
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_BRANCH: feat/r13-local-writer-executor-r1
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ahead_by="$(gh api "repos/$GITHUB_REPOSITORY/compare/main...$HEAD_BRANCH" --jq '.ahead_by')"
+          if [ "$ahead_by" = "0" ]; then
+            echo "implementation branch is not ahead of main; nothing to create"
+            exit 0
+          fi
+
+          existing="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$HEAD_BRANCH" --state open --json number --jq 'length')"
+          if [ "$existing" != "0" ]; then
+            echo "open PR already exists for $HEAD_BRANCH"
+            exit 0
+          fi
+
+          set +e
+          output="$(gh api \
+            --method POST \
+            "repos/$GITHUB_REPOSITORY/pulls" \
+            -f title='feat(writer): add grant-bound local workspace executor' \
+            -f head="$HEAD_BRANCH" \
+            -f base='main' \
+            -f body='## Purpose
+
+Neutral-author replacement for closed PR #71. Implements R13.1 under #70 / #67 using the exact existing implementation branch; only PR author topology changes so the critical R11 profile can be satisfied without counting the change author.
+
+## Safety boundary
+
+- local/sandbox executor only;
+- no GitHub writer adapter;
+- no direct-main path;
+- no merge bypass;
+- no authority/ruleset/required-check changes.
+
+## Acceptance
+
+- nulleimy project-owner exact-head marker;
+- setarchitect independent-reviewer exact-head approval;
+- Quality + CodeQL success;
+- GOVERDOCS Governance Gate non-blocking;
+- exact-head server merge through existing protection;
+- post-merge live probe before R13.1 VERIFIED LIVE.
+
+Tracks #70 and #67.' 2>&1)"
+          rc=$?
+          set -e
+
+          if [ "$rc" -ne 0 ]; then
+            {
+              echo 'R13.1 neutral-author bootstrap FAILED.'
+              echo
+              echo 'GitHub API response:'
+              echo '```text'
+              printf '%s\n' "$output"
+              echo '```'
+            } > /tmp/r13-bootstrap-receipt.md
+            gh issue comment 70 --repo "$GITHUB_REPOSITORY" --body-file /tmp/r13-bootstrap-receipt.md
+            exit "$rc"
+          fi
+
+          pr_number="$(printf '%s' "$output" | jq -r '.number')"
+          gh issue comment 70 --repo "$GITHUB_REPOSITORY" --body "R13.1 neutral-author bootstrap SUCCESS: created PR #$pr_number from $HEAD_BRANCH."

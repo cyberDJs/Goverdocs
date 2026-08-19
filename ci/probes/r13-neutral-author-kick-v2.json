@@ -1,0 +1,6 @@
+{
+  "id": "R13.1-NEUTRAL-AUTHOR-KICK-V2",
+  "runtime_effect": "none",
+  "purpose": "trigger canonical neutral-author helper with success/failure receipt enabled",
+  "tracks": ["GH-ISSUE-70", "GH-ISSUE-67"]
+}

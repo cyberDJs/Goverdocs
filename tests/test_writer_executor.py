@@ -10,7 +10,6 @@ from jsonschema import Draft202012Validator
 from goverdocs.writer_boundary import issue_write_grant
 from goverdocs.writer_executor import LocalWriteExecutionError, execute_local_write
 
-
 HEAD = "a" * 40
 CHANGE = "b" * 64
 

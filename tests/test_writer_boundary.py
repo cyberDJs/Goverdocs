@@ -2,8 +2,8 @@ import copy
 import json
 from pathlib import Path
 
-from jsonschema import Draft202012Validator
 import pytest
+from jsonschema import Draft202012Validator
 
 from goverdocs.writer_boundary import (
     WriteGrantError,
@@ -11,7 +11,6 @@ from goverdocs.writer_boundary import (
     issue_write_grant,
     validate_write_grant,
 )
-
 
 HEAD = "a" * 40
 CHANGE = "b" * 64

@@ -1,0 +1,6 @@
+{
+  "id": "R13.1-NEUTRAL-AUTHOR-KICK",
+  "runtime_effect": "none",
+  "purpose": "trigger main push with neutral-author workflow already canonical",
+  "tracks": ["GH-ISSUE-70", "GH-ISSUE-67"]
+}

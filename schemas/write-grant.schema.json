@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nulleimy/OATHDO/schemas/write-grant.schema.json",
+  "title": "OATHDO Write Grant",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "grant_id",
+    "schema_version",
+    "subject",
+    "gate_status",
+    "gate_report_digest",
+    "operations_digest",
+    "operations"
+  ],
+  "properties": {
+    "grant_id": {
+      "type": "string",
+      "pattern": "^write-grant-v1:[0-9a-f]{64}$"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "pull_request", "head_sha", "change_digest"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "pull_request": {"type": "integer", "minimum": 1},
+        "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "change_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "gate_status": {
+      "enum": ["PASS", "WARN"]
+    },
+    "gate_report_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "operations_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event",
+          "rule_id",
+          "document_type",
+          "action",
+          "target",
+          "write_policy",
+          "approval_required",
+          "severity",
+          "priority"
+        ],
+        "properties": {
+          "event": {"type": "string", "minLength": 1},
+          "rule_id": {"type": "string", "minLength": 1},
+          "document_type": {"type": "string", "minLength": 1},
+          "action": {"type": "string", "minLength": 1},
+          "target": {"type": "string", "minLength": 1},
+          "write_policy": {"type": "string", "minLength": 1},
+          "approval_required": {"type": "boolean"},
+          "severity": {"type": "string", "minLength": 1},
+          "priority": {"type": "integer"}
+        }
+      }
+    }
+  }
+}

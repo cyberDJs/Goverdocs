@@ -92,6 +92,18 @@ def _normalize_operation(raw: object, *, index: int) -> dict[str, object]:
     return normalized
 
 
+def _operation_sort_key(item: dict[str, object]) -> tuple[int, str, str, str]:
+    priority = item.get("priority")
+    if not isinstance(priority, int) or isinstance(priority, bool):
+        raise WriteGrantError("normalized operation priority must be an integer")
+    return (
+        -priority,
+        str(item["rule_id"]),
+        str(item["target"]),
+        str(item["action"]),
+    )
+
+
 def _authorized_operations(gate_report: dict[str, Any]) -> list[dict[str, object]]:
     raw_obligations = gate_report.get("obligations")
     if not isinstance(raw_obligations, list):
@@ -118,15 +130,7 @@ def _authorized_operations(gate_report: dict[str, Any]) -> list[dict[str, object
     if not operations:
         raise WriteGrantError("gate report contains no write operations to authorize")
 
-    return sorted(
-        operations,
-        key=lambda item: (
-            -int(item["priority"]),
-            str(item["rule_id"]),
-            str(item["target"]),
-            str(item["action"]),
-        ),
-    )
+    return sorted(operations, key=_operation_sort_key)
 
 
 def issue_write_grant(gate_report: dict[str, Any]) -> dict[str, Any]:

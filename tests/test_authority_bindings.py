@@ -343,7 +343,6 @@ def test_replacement_requires_revoked_predecessor(tmp_path: Path) -> None:
         "old-user",
         "project-owner",
         github_user_id=101,
-        replaced_by="BIND-NEW",
     )
     new = _binding(
         "BIND-NEW",

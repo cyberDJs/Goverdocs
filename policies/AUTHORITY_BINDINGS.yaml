@@ -22,7 +22,7 @@ bindings:
       - GH-ISSUE-58
     lifecycle:
       - event: enrolled
-        on: "2026-08-17"
+        "on": "2026-08-17"
         evidence_refs:
           - GH-ISSUE-35
           - GH-ISSUE-58
@@ -39,7 +39,7 @@ bindings:
       - GH-ISSUE-58
     lifecycle:
       - event: enrolled
-        on: "2026-08-18"
+        "on": "2026-08-18"
         evidence_refs:
           - GH-PR-38
           - GH-PR-50

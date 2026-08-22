@@ -16,6 +16,7 @@
     "operation_digest",
     "action",
     "target",
+    "file_mode",
     "pre_state",
     "payload_sha256",
     "payload_bytes",
@@ -50,6 +51,7 @@
     "operation_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "action": {"enum": ["create", "update", "append", "update_or_create"]},
     "target": {"type": "string", "minLength": 1},
+    "file_mode": {"enum": ["100644", "100755"]},
     "pre_state": {
       "type": "object",
       "additionalProperties": false,

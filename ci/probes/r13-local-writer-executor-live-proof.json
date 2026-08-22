@@ -1,0 +1,9 @@
+{
+  "id": "R13.1-LOCAL-WRITER-EXECUTOR-LIVE-PROBE",
+  "probe_type": "post-merge-governance-acceptance",
+  "runtime_effect": "none",
+  "writer_capability": "none",
+  "canonical_merge_sha": "83b08062d841926a0d5818be759a0272518757e3",
+  "source_pr": 78,
+  "tracks": ["GH-ISSUE-70", "GH-ISSUE-67"]
+}

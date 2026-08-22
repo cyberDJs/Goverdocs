@@ -1,6 +1,7 @@
 name: r13-neutral-author-once
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -15,6 +16,7 @@ permissions:
 jobs:
   create-neutral-r13-pr:
     if: >-
+      github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push' ||
       (github.event_name == 'issue_comment' &&
        github.event.issue.number == 70 &&
@@ -48,28 +50,7 @@ jobs:
             -f title='feat(writer): add grant-bound local workspace executor' \
             -f head="$HEAD_BRANCH" \
             -f base='main' \
-            -f body='## Purpose
-
-Neutral-author replacement for closed PR #71. Implements R13.1 under #70 / #67 using the exact existing implementation branch; only PR author topology changes so the critical R11 profile can be satisfied without counting the change author.
-
-## Safety boundary
-
-- local/sandbox executor only;
-- no GitHub writer adapter;
-- no direct-main path;
-- no merge bypass;
-- no authority/ruleset/required-check changes.
-
-## Acceptance
-
-- nulleimy project-owner exact-head marker;
-- setarchitect independent-reviewer exact-head approval;
-- Quality + CodeQL success;
-- GOVERDOCS Governance Gate non-blocking;
-- exact-head server merge through existing protection;
-- post-merge live probe before R13.1 VERIFIED LIVE.
-
-Tracks #70 and #67.' 2>&1)"
+            -f body='Neutral-author replacement for closed PR #71. Implements R13.1 under #70 / #67 from the exact existing implementation branch. Safety: local/sandbox executor only; no GitHub writer adapter; no direct-main path; no merge bypass; no authority, ruleset, or required-check changes. Acceptance: exact-head project-owner plus independent-reviewer authority; Quality plus CodeQL; GOVERDOCS Governance Gate; protected expected-head server merge; post-merge live probe before VERIFIED LIVE.' 2>&1)"
           rc=$?
           set -e
 

@@ -433,7 +433,8 @@ class GitHubBranchRESTClient:
         request = Request(url, data=data, headers=headers, method=method)
         try:
             with urlopen(request, timeout=self.timeout) as response:
-                return json.loads(response.read().decode("utf-8"))
+                value: object = json.loads(response.read().decode("utf-8"))
+                return value
         except HTTPError as exc:
             if allow_not_found and exc.code == 404:
                 return None

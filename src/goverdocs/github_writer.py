@@ -18,12 +18,17 @@ class GitHubBranchWriteError(RuntimeError):
     pass
 
 
+class GitHubBranchWriteAmbiguousError(GitHubBranchWriteError):
+    """The branch ref moved, but final verification could not prove the result."""
+
+
 class GitHubBranchWriter(Protocol):
     def get_pull(self, repository: str, pull_request: int) -> object: ...
     def get_repository(self, repository: str) -> object: ...
     def get_ref(self, repository: str, branch: str) -> object: ...
-    def get_content(self, repository: str, path: str, ref: str) -> object | None: ...
     def get_commit(self, repository: str, commit_sha: str) -> object: ...
+    def get_tree(self, repository: str, tree_sha: str, *, recursive: bool) -> object: ...
+    def get_blob(self, repository: str, blob_sha: str) -> object: ...
     def create_blob(self, repository: str, content: bytes) -> object: ...
     def create_tree(
         self,
@@ -32,6 +37,7 @@ class GitHubBranchWriter(Protocol):
         base_tree_sha: str,
         path: str,
         blob_sha: str,
+        mode: str,
     ) -> object: ...
     def create_commit(
         self,
@@ -52,8 +58,10 @@ class GitHubBranchWriter(Protocol):
 
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
-_HEAD_SHA = re.compile(r"^[0-9a-f]{40}$")
+_GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
+_REPOSITORY = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 _SUPPORTED_ACTIONS = {"create", "update", "append", "update_or_create"}
+_WRITABLE_FILE_MODES = {"100644", "100755"}
 _WILDCARD_CHARS = frozenset("*?[]")
 
 
@@ -84,9 +92,20 @@ def _required_str(value: dict[str, Any], key: str, context: str) -> str:
     return raw
 
 
+def _git_sha(value: object, context: str) -> str:
+    if not isinstance(value, str) or _GIT_SHA.fullmatch(value) is None:
+        raise GitHubBranchWriteError(f"{context} must be a lowercase 40-character git SHA")
+    return value
+
+
 def _validate_repository(repository: str) -> None:
-    if repository.count("/") != 1 or repository.startswith("/") or repository.endswith("/"):
-        raise GitHubBranchWriteError("repository must use owner/name form")
+    if _REPOSITORY.fullmatch(repository) is None:
+        raise GitHubBranchWriteError("repository must use a safe owner/name form")
+
+
+def _validate_pull_request(pull_request: int) -> None:
+    if not isinstance(pull_request, int) or isinstance(pull_request, bool) or pull_request < 1:
+        raise GitHubBranchWriteError("pull_request must be a positive integer")
 
 
 def _target_path(value: object) -> str:
@@ -119,18 +138,16 @@ def _expected_digest(value: str | None, *, required: bool) -> str | None:
     return value
 
 
-def _decode_content(payload: object, *, path: str) -> bytes:
-    item = _dict(payload, f"GitHub content {path}")
-    if item.get("type") != "file":
-        raise GitHubBranchWriteError("authorized target exists but is not a regular file")
+def _decode_blob(payload: object, *, context: str) -> bytes:
+    item = _dict(payload, context)
     encoding = item.get("encoding")
     content = item.get("content")
     if encoding != "base64" or not isinstance(content, str):
-        raise GitHubBranchWriteError("GitHub content response is not inline base64 file content")
+        raise GitHubBranchWriteError(f"{context} is not base64 Git blob content")
     try:
         return base64.b64decode(content, validate=False)
     except (ValueError, TypeError) as exc:
-        raise GitHubBranchWriteError("GitHub content response contains invalid base64") from exc
+        raise GitHubBranchWriteError(f"{context} contains invalid base64") from exc
 
 
 def _pull_binding(
@@ -149,12 +166,14 @@ def _pull_binding(
     head_repo = _dict(head.get("repo"), "GitHub pull request head.repo")
     head_repo_name = _required_str(head_repo, "full_name", "GitHub pull request head.repo")
     head_ref = _required_str(head, "ref", "GitHub pull request head")
-    head_sha = _required_str(head, "sha", "GitHub pull request head")
+    head_sha = _git_sha(head.get("sha"), "GitHub pull request head.sha")
 
     if head_repo_name != repository:
         raise GitHubBranchWriteError("fork pull request heads are not writable in R13.2")
     if head_ref != branch:
-        raise GitHubBranchWriteError("requested branch does not match the grant-bound PR head branch")
+        raise GitHubBranchWriteError(
+            "requested branch does not match the grant-bound PR head branch"
+        )
     if head_sha != expected_head_sha:
         raise GitHubBranchWriteError("grant-bound PR head moved after authorization")
 
@@ -162,10 +181,131 @@ def _pull_binding(
 def _ref_sha(payload: object) -> str:
     ref = _dict(payload, "GitHub branch ref")
     obj = _dict(ref.get("object"), "GitHub branch ref.object")
-    sha = _required_str(obj, "sha", "GitHub branch ref.object")
-    if _HEAD_SHA.fullmatch(sha) is None:
-        raise GitHubBranchWriteError("GitHub branch ref returned an invalid commit SHA")
-    return sha
+    return _git_sha(obj.get("sha"), "GitHub branch ref.object.sha")
+
+
+def _assert_branch_writable(
+    writer: GitHubBranchWriter,
+    *,
+    repository: str,
+    branch: str,
+) -> None:
+    repository_info = _dict(writer.get_repository(repository), "GitHub repository")
+    default_branch = _required_str(repository_info, "default_branch", "GitHub repository")
+    if branch == "main" or branch == default_branch:
+        raise GitHubBranchWriteError(
+            "direct writes to main or the repository default branch are forbidden"
+        )
+
+
+def _root_tree_sha(writer: GitHubBranchWriter, repository: str, commit_sha: str) -> str:
+    commit = _dict(writer.get_commit(repository, commit_sha), "GitHub commit")
+    tree = _dict(commit.get("tree"), "GitHub commit.tree")
+    return _git_sha(tree.get("sha"), "GitHub commit.tree.sha")
+
+
+def _tree_entry(
+    writer: GitHubBranchWriter,
+    *,
+    repository: str,
+    root_tree_sha: str,
+    target: str,
+) -> dict[str, Any] | None:
+    payload = _dict(
+        writer.get_tree(repository, root_tree_sha, recursive=True),
+        "GitHub recursive tree",
+    )
+    if payload.get("truncated") is True:
+        raise GitHubBranchWriteError("GitHub recursive tree response is truncated")
+
+    raw_entries = payload.get("tree")
+    if not isinstance(raw_entries, list):
+        raise GitHubBranchWriteError("GitHub recursive tree.tree must be a JSON array")
+
+    relevant = {target}
+    parts = target.split("/")
+    relevant.update("/".join(parts[:index]) for index in range(1, len(parts)))
+
+    entries: dict[str, dict[str, Any]] = {}
+    for index, raw in enumerate(raw_entries):
+        if not isinstance(raw, dict):
+            raise GitHubBranchWriteError(
+                f"GitHub recursive tree.tree[{index}] must be a JSON object"
+            )
+        path = raw.get("path")
+        if isinstance(path, str) and path in relevant:
+            if path in entries:
+                raise GitHubBranchWriteError(f"GitHub recursive tree duplicates path {path}")
+            entries[path] = raw
+
+    for ancestor in sorted(relevant - {target}, key=lambda value: value.count("/")):
+        entry = entries.get(ancestor)
+        if entry is not None and entry.get("type") != "tree":
+            raise GitHubBranchWriteError(
+                "authorized target has a non-directory Git tree ancestor"
+            )
+
+    return entries.get(target)
+
+
+def _target_snapshot(
+    writer: GitHubBranchWriter,
+    *,
+    repository: str,
+    root_tree_sha: str,
+    target: str,
+) -> tuple[bool, bytes, str | None]:
+    entry = _tree_entry(
+        writer,
+        repository=repository,
+        root_tree_sha=root_tree_sha,
+        target=target,
+    )
+    if entry is None:
+        return False, b"", None
+
+    if entry.get("type") != "blob":
+        raise GitHubBranchWriteError("authorized target exists but is not a regular Git blob")
+    mode = _required_str(entry, "mode", "GitHub target tree entry")
+    if mode not in _WRITABLE_FILE_MODES:
+        raise GitHubBranchWriteError(
+            f"authorized target has unsupported Git file mode {mode}"
+        )
+    blob_sha = _git_sha(entry.get("sha"), "GitHub target tree entry.sha")
+    content = _decode_blob(
+        writer.get_blob(repository, blob_sha),
+        context="GitHub target blob",
+    )
+    return True, content, mode
+
+
+def _verify_post_state(
+    writer: GitHubBranchWriter,
+    *,
+    repository: str,
+    branch: str,
+    new_head_sha: str,
+    target: str,
+    expected_content: bytes,
+    expected_mode: str,
+) -> bytes:
+    if _ref_sha(writer.get_ref(repository, branch)) != new_head_sha:
+        raise GitHubBranchWriteAmbiguousError(
+            f"post-write branch verification failed after ref update; expected {new_head_sha}"
+        )
+
+    root_tree_sha = _root_tree_sha(writer, repository, new_head_sha)
+    existed, written, mode = _target_snapshot(
+        writer,
+        repository=repository,
+        root_tree_sha=root_tree_sha,
+        target=target,
+    )
+    if not existed or written != expected_content or mode != expected_mode:
+        raise GitHubBranchWriteAmbiguousError(
+            f"post-write content verification failed after ref update at {new_head_sha}"
+        )
+    return written
 
 
 def execute_github_branch_write(
@@ -185,13 +325,13 @@ def execute_github_branch_write(
     """Execute one grant-authorized UTF-8 text mutation on an existing PR head branch."""
 
     _validate_repository(repository)
+    _validate_pull_request(pull_request)
+    head_sha = _git_sha(head_sha, "head_sha")
     if not isinstance(branch, str) or not branch.strip():
         raise GitHubBranchWriteError("branch must be a non-empty string")
     branch = branch.strip()
     if branch.startswith("refs/"):
         raise GitHubBranchWriteError("branch must be a short ref name")
-    if _HEAD_SHA.fullmatch(head_sha) is None:
-        raise GitHubBranchWriteError("head_sha must be an exact lowercase 40-character SHA")
 
     try:
         authorize_operation(
@@ -222,13 +362,11 @@ def execute_github_branch_write(
     try:
         payload = content.encode("utf-8")
     except UnicodeEncodeError as exc:
-        raise GitHubBranchWriteError("GitHub branch writer content is not valid UTF-8 text") from exc
+        raise GitHubBranchWriteError(
+            "GitHub branch writer content is not valid UTF-8 text"
+        ) from exc
 
-    repository_info = _dict(writer.get_repository(repository), "GitHub repository")
-    default_branch = _required_str(repository_info, "default_branch", "GitHub repository")
-    if branch == default_branch:
-        raise GitHubBranchWriteError("direct writes to the repository default branch are forbidden")
-
+    _assert_branch_writable(writer, repository=repository, branch=branch)
     _pull_binding(
         writer,
         repository=repository,
@@ -237,18 +375,26 @@ def execute_github_branch_write(
         expected_head_sha=head_sha,
     )
     if _ref_sha(writer.get_ref(repository, branch)) != head_sha:
-        raise GitHubBranchWriteError("branch ref does not match the grant-bound expected HEAD")
+        raise GitHubBranchWriteError(
+            "branch ref does not match the grant-bound expected HEAD"
+        )
 
-    existing_payload = writer.get_content(repository, target, head_sha)
-    existed = existing_payload is not None
-    before = _decode_content(existing_payload, path=target) if existed else b""
+    base_tree_sha = _root_tree_sha(writer, repository, head_sha)
+    existed, before, before_mode = _target_snapshot(
+        writer,
+        repository=repository,
+        root_tree_sha=base_tree_sha,
+        target=target,
+    )
     before_digest = _bytes_digest(before) if existed else None
 
     if action == "create":
         if existed:
             raise GitHubBranchWriteError("create action cannot overwrite an existing target")
         if expected_before_sha256 is not None:
-            raise GitHubBranchWriteError("create action must not declare a pre-state digest")
+            raise GitHubBranchWriteError(
+                "create action must not declare a pre-state digest"
+            )
     elif action in {"update", "append"}:
         if not existed:
             raise GitHubBranchWriteError(f"{action} action requires an existing target")
@@ -270,8 +416,19 @@ def execute_github_branch_write(
 
     after = before + payload if action == "append" else payload
     if existed and after == before:
-        raise GitHubBranchWriteError("authorized GitHub branch write would not change target state")
+        raise GitHubBranchWriteError(
+            "authorized GitHub branch write would not change target state"
+        )
+    try:
+        after.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise GitHubBranchWriteError(
+            "authorized GitHub branch write would not produce UTF-8 text"
+        ) from exc
 
+    file_mode = before_mode if before_mode is not None else "100644"
+
+    _assert_branch_writable(writer, repository=repository, branch=branch)
     _pull_binding(
         writer,
         repository=repository,
@@ -282,33 +439,19 @@ def execute_github_branch_write(
     if _ref_sha(writer.get_ref(repository, branch)) != head_sha:
         raise GitHubBranchWriteError("branch ref changed after pre-state verification")
 
-    current_payload = writer.get_content(repository, target, head_sha)
-    if existed:
-        if current_payload is None:
-            raise GitHubBranchWriteError("target disappeared after pre-state verification")
-        if _bytes_digest(_decode_content(current_payload, path=target)) != before_digest:
-            raise GitHubBranchWriteError("target changed after pre-state verification")
-    elif current_payload is not None:
-        raise GitHubBranchWriteError("target appeared after pre-state verification")
-
-    parent_commit = _dict(writer.get_commit(repository, head_sha), "GitHub parent commit")
-    parent_tree = _dict(parent_commit.get("tree"), "GitHub parent commit.tree")
-    base_tree_sha = _required_str(parent_tree, "sha", "GitHub parent commit.tree")
-    if _HEAD_SHA.fullmatch(base_tree_sha) is None:
-        raise GitHubBranchWriteError("GitHub parent commit returned an invalid tree SHA")
-
     blob = _dict(writer.create_blob(repository, after), "GitHub blob")
-    blob_sha = _required_str(blob, "sha", "GitHub blob")
+    blob_sha = _git_sha(blob.get("sha"), "GitHub blob.sha")
     tree = _dict(
         writer.create_tree(
             repository,
             base_tree_sha=base_tree_sha,
             path=target,
             blob_sha=blob_sha,
+            mode=file_mode,
         ),
         "GitHub tree",
     )
-    tree_sha = _required_str(tree, "sha", "GitHub tree")
+    tree_sha = _git_sha(tree.get("sha"), "GitHub tree.sha")
     operation_digest = _digest(operation)
     commit = _dict(
         writer.create_commit(
@@ -323,9 +466,22 @@ def execute_github_branch_write(
         ),
         "GitHub commit",
     )
-    new_head_sha = _required_str(commit, "sha", "GitHub commit")
-    if _HEAD_SHA.fullmatch(new_head_sha) is None or new_head_sha == head_sha:
-        raise GitHubBranchWriteError("GitHub commit returned an invalid new HEAD SHA")
+    new_head_sha = _git_sha(commit.get("sha"), "GitHub commit.sha")
+    if new_head_sha == head_sha:
+        raise GitHubBranchWriteError("GitHub commit did not produce a new HEAD SHA")
+
+    _assert_branch_writable(writer, repository=repository, branch=branch)
+    _pull_binding(
+        writer,
+        repository=repository,
+        pull_request=pull_request,
+        branch=branch,
+        expected_head_sha=head_sha,
+    )
+    if _ref_sha(writer.get_ref(repository, branch)) != head_sha:
+        raise GitHubBranchWriteError(
+            "branch ref changed before compare-and-swap update"
+        )
 
     try:
         update = writer.update_ref(
@@ -339,21 +495,26 @@ def execute_github_branch_write(
             "GitHub branch compare-and-swap update failed; expected HEAD may be stale"
         ) from exc
     if _ref_sha(update) != new_head_sha:
-        raise GitHubBranchWriteError("GitHub branch ref update did not return the new commit SHA")
-    if _ref_sha(writer.get_ref(repository, branch)) != new_head_sha:
-        raise GitHubBranchWriteError("post-write branch verification did not observe the new commit")
+        raise GitHubBranchWriteAmbiguousError(
+            f"GitHub ref update returned an unexpected SHA after mutation attempt; expected {new_head_sha}"
+        )
 
-    post_content = writer.get_content(repository, target, new_head_sha)
-    if post_content is None:
-        raise GitHubBranchWriteError("post-write content verification could not read target")
-    written = _decode_content(post_content, path=target)
-    if written != after:
-        raise GitHubBranchWriteError("post-write content does not match intended payload")
+    written = _verify_post_state(
+        writer,
+        repository=repository,
+        branch=branch,
+        new_head_sha=new_head_sha,
+        target=target,
+        expected_content=after,
+        expected_mode=file_mode,
+    )
 
     subject = grant.get("subject")
     grant_id = grant.get("grant_id")
     if not isinstance(subject, dict) or not isinstance(grant_id, str) or not grant_id:
-        raise GitHubBranchWriteError("canonical write grant is missing receipt binding fields")
+        raise GitHubBranchWriteAmbiguousError(
+            f"branch updated to {new_head_sha} but canonical grant receipt fields are missing"
+        )
 
     receipt_payload: dict[str, Any] = {
         "schema_version": 1,
@@ -366,6 +527,7 @@ def execute_github_branch_write(
         "operation_digest": operation_digest,
         "action": action,
         "target": target,
+        "file_mode": file_mode,
         "pre_state": {"exists": existed, "sha256": before_digest},
         "payload_sha256": _bytes_digest(payload),
         "payload_bytes": len(payload),
@@ -396,7 +558,9 @@ class GitHubBranchRESTClient:
     ) -> GitHubBranchRESTClient:
         token = os.environ.get(token_env)
         if not token:
-            raise GitHubBranchWriteError(f"{token_env} is required for GitHub branch writes")
+            raise GitHubBranchWriteError(
+                f"{token_env} is required for GitHub branch writes"
+            )
         return cls(
             token=token,
             api_url=api_url.rstrip("/"),
@@ -453,7 +617,9 @@ class GitHubBranchRESTClient:
     @staticmethod
     def _required_response(value: object | None, context: str) -> object:
         if value is None:
-            raise GitHubBranchWriteError(f"{context} unexpectedly returned no response")
+            raise GitHubBranchWriteError(
+                f"{context} unexpectedly returned no response"
+            )
         return value
 
     def get_pull(self, repository: str, pull_request: int) -> object:
@@ -475,19 +641,27 @@ class GitHubBranchRESTClient:
             "GitHub branch ref",
         )
 
-    def get_content(self, repository: str, path: str, ref: str) -> object | None:
-        encoded_path = quote(path, safe="/")
-        return self._json(
-            "GET",
-            f"/repos/{repository}/contents/{encoded_path}",
-            params={"ref": ref},
-            allow_not_found=True,
-        )
-
     def get_commit(self, repository: str, commit_sha: str) -> object:
         return self._required_response(
             self._json("GET", f"/repos/{repository}/git/commits/{commit_sha}"),
             "GitHub commit",
+        )
+
+    def get_tree(self, repository: str, tree_sha: str, *, recursive: bool) -> object:
+        params = {"recursive": "1"} if recursive else None
+        return self._required_response(
+            self._json(
+                "GET",
+                f"/repos/{repository}/git/trees/{tree_sha}",
+                params=params,
+            ),
+            "GitHub tree",
+        )
+
+    def get_blob(self, repository: str, blob_sha: str) -> object:
+        return self._required_response(
+            self._json("GET", f"/repos/{repository}/git/blobs/{blob_sha}"),
+            "GitHub blob",
         )
 
     def create_blob(self, repository: str, content: bytes) -> object:
@@ -508,6 +682,7 @@ class GitHubBranchRESTClient:
         base_tree_sha: str,
         path: str,
         blob_sha: str,
+        mode: str,
     ) -> object:
         return self._required_response(
             self._json(
@@ -518,7 +693,7 @@ class GitHubBranchRESTClient:
                     "tree": [
                         {
                             "path": path,
-                            "mode": "100644",
+                            "mode": mode,
                             "type": "blob",
                             "sha": blob_sha,
                         }

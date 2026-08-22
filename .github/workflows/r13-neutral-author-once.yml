@@ -1,6 +1,7 @@
 name: r13-neutral-author-once
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -15,6 +16,7 @@ permissions:
 jobs:
   create-neutral-r13-pr:
     if: >-
+      github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push' ||
       (github.event_name == 'issue_comment' &&
        github.event.issue.number == 70 &&
